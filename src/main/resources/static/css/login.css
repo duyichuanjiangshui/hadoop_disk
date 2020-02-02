@@ -1,0 +1,25 @@
+body{
+    /*background: rgb(185, 246, 246);*//*设置颜色背景*/
+    background-repeat:no-repeat;/*图片适应窗口大小，这里设置的是不进行平铺*/
+    background-attachment: fixed;/*图片相对于浏览器固定,这里设置背景图片固定，不随内容滚动*/
+    background-origin: border-box;/*从边框区域显示*/
+    background-size:cover;/*指定图片大小，此时会保持图像的纵横比并将图像缩放成将完全覆盖背景定位区域的最小大小*/
+}
+.loginLine{
+    opacity: 80%;   /*透明度*/
+    background: aliceblue;
+    margin: 5% 60%;
+    width: 320px;
+    height: 250px;
+    padding-top: 2px;
+    padding-right: 40px;
+    border-radius: 20px;  /* 圆角 */
+
+}
+.yhdl{
+    margin:5% auto;
+    text-align: center;
+    font-size: 20px;
+    color: darkgray;
+    font-family: Webdings;
+}
