@@ -28,7 +28,6 @@ public class HDFSUtil {
         FileSystem fs = FileSystem.get(URI.create(uri), conf);
         fs.copyFromLocalFile(new Path(local), new Path(remote));
         System.out.println("copy from: " + local + " to " + remote);
-        fs.close();
     }
 
     /**
@@ -44,7 +43,6 @@ public class HDFSUtil {
         FileSystem fs = FileSystem.get(URI.create(uri), conf);
         fs.copyToLocalFile(path, new Path(local));
         System.out.println("download: from" + remote + " to " + local);
-        fs.close();
     }
 
     /**
@@ -52,7 +50,7 @@ public class HDFSUtil {
      * hdfsPath是上传的目录
      * @throws IOException
      */
-    public static void createFile(MultipartFile mfile, String hdfsPath) throws IOException {
+    public static String createFile(MultipartFile mfile, String hdfsPath) throws IOException {
         InputStream in = null;
         RowkeyUtil rowkeyUtil=new RowkeyUtil();
         //用rowkey作为唯一表示
@@ -65,11 +63,11 @@ public class HDFSUtil {
         String aimpath=hdfsPath+"\\"+rowkeyUtil.getRowkey()+'.'+suffix;
         FileSystem fs=HdfsConn.getFileSystem();
         fs.copyFromLocalFile(new Path(localPath),new Path(aimpath));
-        //3 关闭资源
-        fs.close();
+        //3 关闭
         System.out.println("over");
         File del = new File(localPath);//将本地文件删除
         del.delete();
+        return aimpath;
     }
     /*
     * hdfs是否存在文件夹

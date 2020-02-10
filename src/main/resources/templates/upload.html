@@ -29,7 +29,7 @@
     <button type="button" class="layui-btn" id="testListAction">开始上传</button>
 </div>
 <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
-    <legend>文件大于200MB，请用大文件上传</legend>
+    <legend>友情提示：文件大于200MB，请用大文件上传</legend>
 </fieldset>
 <div>
 <button type="button" class="layui-btn" id="addFile">
@@ -45,7 +45,7 @@
     layui.use(['upload', 'element', 'layer'], function () {
         let $ = layui.jquery;
         const upload = layui.upload, element = layui.element, layer = layui.layer;
-
+        var fatherFolderid=[[${fatherFolderid}]];
         //创建监听函数
         const xhrOnProgress = function (fun) {
             xhrOnProgress.onprogress = fun; //绑定监听
@@ -65,7 +65,7 @@
         };
         element.init();
         //多文件列表示例
-        const uoloadUrl = "/hadoop/uploadAndDown/upload";
+        const uoloadUrl = "/hadoop/uploadAndDown/upload?fatherFolderid="+fatherFolderid;
         const demoListView = $('#demoList')
             , uploadListIns = upload.render({
             elem: '#testList'
@@ -137,13 +137,13 @@
     layui.use(["layer","form", "upload","jquery","element"], function () {
         // 注意：为了动态显示进度条，必须加载element组件
         var layer = layui.layer, upload = layui.upload, $ = layui.jquery, element = layui.element;
-
+        var fatherFolderid=[[${fatherFolderid}]];
         upload.render({
             accept : "file",
             elem : "#addFile",
             auto : false,   //关闭文件自动上传
             bindAction : "#upload", //文件上传触发按钮
-            url :  "/hadoop/uploadAndDown/upload",
+            url :  "/hadoop/uploadAndDown/upload?fatherFolderid="+fatherFolderid,
             progress:function(value){//上传进度回调 value进度值
                 element.progress('uploadProgressBar', value+'%')//设置页面进度条
             },
