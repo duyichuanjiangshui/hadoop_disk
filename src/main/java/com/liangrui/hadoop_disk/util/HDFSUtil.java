@@ -17,32 +17,25 @@ import org.apache.hadoop.io.IOUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 public class HDFSUtil {
-    /**
-     * 按路径上传文件到hdfs
-     * @param conf
-     * @param local
-     * @param remote
-     * @throws IOException
-     */
-    public static void copyFile(Configuration conf , String uri , String local, String remote) throws IOException {
-        FileSystem fs = FileSystem.get(URI.create(uri), conf);
-        fs.copyFromLocalFile(new Path(local), new Path(remote));
-        System.out.println("copy from: " + local + " to " + remote);
-    }
 
-    /**
-     * 按路径下载hdfs上的文件
-     * @param conf
-     * @param uri
-     * @param remote
-     * @param local
-     * @throws IOException
-     */
-    public static void download(Configuration conf , String uri ,String remote, String local) throws IOException {
-        Path path = new Path(remote);
-        FileSystem fs = FileSystem.get(URI.create(uri), conf);
-        fs.copyToLocalFile(path, new Path(local));
-        System.out.println("download: from" + remote + " to " + local);
+
+
+    /*
+    * hdfs的下载
+    *
+    * */
+    public static void downFile(String frompath,String aimpath) throws IOException {
+        // 1 获取文件系统
+        FileSystem fs=HdfsConn.getFileSystem();
+        // 2 执行下载操作
+        //boolean delSrc 指是否将原文件删除
+        //Path src 指要下载的文件路径
+        //Path dst 指将文件下载到的路径
+        //boolean useRawLocalFileSystem 是否开启文件校验
+        fs.copyToLocalFile(false,new Path(frompath),new Path(aimpath),true);
+        //3 关闭资源
+        fs.close();
+        System.out.println("over");
     }
 
     /**

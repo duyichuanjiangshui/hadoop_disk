@@ -3,6 +3,7 @@ package com.liangrui.hadoop_disk.util;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.Calendar;
+import java.util.UUID;
 
 public class RowkeyUtil {
     /*
@@ -19,13 +20,14 @@ public class RowkeyUtil {
     public String getRowkey()
     {
         Calendar calendar=Calendar.getInstance();
+
         DateUtil dateUtil=new DateUtil();
         String last=dateUtil.getYear(calendar)+dateUtil.getMonth(calendar)+
                 dateUtil.getDay(calendar)+dateUtil.getHour(calendar)+dateUtil.getminute(calendar)
                 +dateUtil.getSecond(calendar);
 
        String first=DigestUtils.md5Hex(last);
-       return first.substring(0,4)+last;
+       return first.substring(0,4)+last+UUID.randomUUID().toString().substring(0,4);
     }
 
 }

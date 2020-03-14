@@ -7,7 +7,7 @@ public class Sharedetail {
 
     private Integer resourcetype;
 
-    private Integer resourcetypeid;
+    private String resourcetypeid;
 
     public Integer getSharedetailid() {
         return sharedetailid;
@@ -33,11 +33,11 @@ public class Sharedetail {
         this.resourcetype = resourcetype;
     }
 
-    public Integer getResourcetypeid() {
+    public String getResourcetypeid() {
         return resourcetypeid;
     }
 
-    public void setResourcetypeid(Integer resourcetypeid) {
-        this.resourcetypeid = resourcetypeid;
+    public void setResourcetypeid(String resourcetypeid) {
+        this.resourcetypeid = resourcetypeid == null ? null : resourcetypeid.trim();
     }
 }

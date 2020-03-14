@@ -3,6 +3,8 @@ package com.liangrui.hadoop_disk.bean.entity;
 public class Usermessage {
     private Integer id;
 
+    private Integer statue;
+
     private Integer touserid;
 
     private Integer fromuserid;
@@ -17,6 +19,14 @@ public class Usermessage {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getStatue() {
+        return statue;
+    }
+
+    public void setStatue(Integer statue) {
+        this.statue = statue;
     }
 
     public Integer getTouserid() {

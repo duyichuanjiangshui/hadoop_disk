@@ -15,10 +15,9 @@ public interface SharedetailMapper {
         "insert into sharedetail (shareDetailId, shareId, ",
         "resourceType, resourceTypeId)",
         "values (#{sharedetailid,jdbcType=INTEGER}, #{shareid,jdbcType=INTEGER}, ",
-        "#{resourcetype,jdbcType=INTEGER}, #{resourcetypeid,jdbcType=INTEGER})"
+        "#{resourcetype,jdbcType=INTEGER}, #{resourcetypeid,jdbcType=VARCHAR})"
     })
     int insert(Sharedetail record);
-
 
 
     @Select({
@@ -31,16 +30,17 @@ public interface SharedetailMapper {
         @Result(column="shareDetailId", property="sharedetailid", jdbcType= JdbcType.INTEGER, id=true),
         @Result(column="shareId", property="shareid", jdbcType= JdbcType.INTEGER),
         @Result(column="resourceType", property="resourcetype", jdbcType= JdbcType.INTEGER),
-        @Result(column="resourceTypeId", property="resourcetypeid", jdbcType= JdbcType.INTEGER)
+        @Result(column="resourceTypeId", property="resourcetypeid", jdbcType= JdbcType.VARCHAR)
     })
     Sharedetail selectByPrimaryKey(Integer sharedetailid);
+
 
 
     @Update({
         "update sharedetail",
         "set shareId = #{shareid,jdbcType=INTEGER},",
           "resourceType = #{resourcetype,jdbcType=INTEGER},",
-          "resourceTypeId = #{resourcetypeid,jdbcType=INTEGER}",
+          "resourceTypeId = #{resourcetypeid,jdbcType=VARCHAR}",
         "where shareDetailId = #{sharedetailid,jdbcType=INTEGER}"
     })
     int updateByPrimaryKey(Sharedetail record);

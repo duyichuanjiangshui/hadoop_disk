@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,9 +24,10 @@ public class UploadAndDownServiceImpl implements UploadAndDownService {
     FileindexMapper fileindexMapper;
     @Override
     @Transactional(rollbackFor = {RuntimeException.class, Error.class})
-    public int uploadFile(MultipartFile file,int userid,int fatherFolderid) {
+    public int uploadFile(MultipartFile file,int userid,String fatherFolderid) {
         String fileName = file.getOriginalFilename();
         String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);//获取文件类型
+        int sorttype=SortFileUtil.sortFile(suffix);
         //小于10MB的存入hbase
         String nowtime=DateUtil.DateToString("yyyy-MM-dd HH:mm:ss", new Date());
         Upload upload=new Upload();
@@ -42,8 +44,9 @@ public class UploadAndDownServiceImpl implements UploadAndDownService {
         fileindex.setSize((float) file.getSize());
         fileindex.setUploadtime(nowtime);
         fileindex.setUpdatetime(nowtime);
-        fileindex.setFatherfolder(fatherFolderid);
+        fileindex.setFatherfolderid(fatherFolderid);
         fileindex.setFiletype(suffix);
+        fileindex.setSortype(sorttype);
         if(file.getSize()<10240000)
         {
             try {
@@ -87,4 +90,41 @@ public class UploadAndDownServiceImpl implements UploadAndDownService {
         }
         return 0;
     }
+    //filid 文件的id
+    public void downFile(HttpServletResponse response, String fileindexid)
+    {
+        Fileindex fileindex=fileindexMapper.selectByPrimaryKey(Integer.valueOf(fileindexid));
+        Upload upload=uploadMapper.selectByPrimaryKey(fileindex.getUploadlocationid());
+
+        String data;
+        String catalogue="D:\\downtemp\\";
+        //为了避免重复
+        RowkeyUtil rowkeyUtil=new RowkeyUtil();
+        String filepath=catalogue+ rowkeyUtil.getRowkey()+fileindex.getName();
+        if(upload.getUploadtype()==0)
+        {
+            try {
+                data=HbaseUtil.getData(upload.getUploadlocation());
+                FileChange.decoderBase64File(data,filepath, catalogue );
+                DownloadUtil.fileDownload(response,filepath,fileindex.getName());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+        }else {
+            try {
+                HDFSUtil.downFile(upload.getUploadlocation(),filepath);
+                DownloadUtil.fileDownload(response,filepath,fileindex.getName());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+
+    }
+
 }

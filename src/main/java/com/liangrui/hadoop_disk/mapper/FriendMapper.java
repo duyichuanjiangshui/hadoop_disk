@@ -2,8 +2,12 @@ package com.liangrui.hadoop_disk.mapper;
 
 
 import com.liangrui.hadoop_disk.bean.entity.Friend;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
+
+
 @Mapper
 public interface FriendMapper {
     @Delete({
@@ -50,4 +54,13 @@ public interface FriendMapper {
         "where id = #{id,jdbcType=INTEGER}"
     })
     int updateByPrimaryKey(Friend record);
+
+    @Select("select * from friend where masterId = #{masterid}")
+    List<Friend> findbymasterid(int masterid);
+
+    @Select("select id from friend where masterId = #{masterid} and friendId = #{friendid}")
+    Integer findbyfriendid(int masterid,int friendid);
+
+    @Delete("delete from friend where (masterId = #{masterid} and friendId = #{friendid}) or (masterId = #{friendid} and friendId = #{masterid})")
+    int deletefriend(int masterid,int friendid);
 }

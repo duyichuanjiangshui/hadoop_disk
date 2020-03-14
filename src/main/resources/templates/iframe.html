@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all">
     <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
     <script src="../static/layui-v2.2.5/layui.js"></script>
-    <script src="../static/js/jquery.min.js"></script>
 </head>
 <body class="layui-layout-body">
 <div class="layui-layout layui-layout-admin">
@@ -18,9 +17,7 @@
         <!-- 头部区域（可配合layui已有的水平导航） -->
         <ul class="layui-nav layui-layout-left">
             <li class="layui-nav-item"><a href="">网盘</a></li>
-            <li class="layui-nav-item"><a href="">分享</a></li>
             <li class="layui-nav-item"><a href="">找资源</a></li>
-
         </ul>
         <ul class="layui-nav layui-layout-right">
             <li class="layui-nav-item">
@@ -41,14 +38,14 @@
         <div class="layui-side-scroll">
             <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
             <ul class="layui-nav layui-nav-tree"  lay-filter="test">
-                <li class="layui-nav-item"><a data-url="/hadoop/fileAndFolder/allFile?fatherFolderid=0" data-id="root" data-title="全部文件" class="site-demo-active" href="javascript:;" data-type="tabAdd">全部文件</a></li>
-                <li class="layui-nav-item"><a href="">图片</a></li>
-                <li class="layui-nav-item"><a href="">文档</a></li>
-                <li class="layui-nav-item"><a href="">视频</a></li>
-                <li class="layui-nav-item"><a href="">音乐</a></li>
-                <li class="layui-nav-item"><a href="">其他</a></li>
+                <li class="layui-nav-item"><a  th:onclick="addtap('/hadoop/fileAndFolder/allFile?fatherFolderid='+[[${fatherFolderid}]],[[${fatherFolderid}]],'全部文件')">全部文件</a></li>
+                <li class="layui-nav-item"><a data-url="/hadoop/fileAndFolder/alonetypefile?type=0" data-id="word" data-title="文档" class="site-demo-active" href="javascript:;" data-type="tabAdd">文档</a></li>
+                <li class="layui-nav-item"><a data-url="/hadoop/fileAndFolder/alonetypefile?type=1" data-id="img" data-title="图片" class="site-demo-active" href="javascript:;" data-type="tabAdd">图片</a></li>
+                <li class="layui-nav-item"><a data-url="/hadoop/fileAndFolder/alonetypefile?type=2" data-id="music" data-title="音乐" class="site-demo-active" href="javascript:;" data-type="tabAdd">音乐</a></li>
+                <li class="layui-nav-item"><a data-url="/hadoop/fileAndFolder/alonetypefile?type=3" data-id="video" data-title="视频" class="site-demo-active" href="javascript:;" data-type="tabAdd">视频</a></li>
+                <li class="layui-nav-item"><a data-url="/hadoop/fileAndFolder/alonetypefile?type=4" data-id="other" data-title="其他" class="site-demo-active" href="javascript:;" data-type="tabAdd">其他</a></li>
                 <li class="layui-nav-item"><a href="">我的分享</a></li>
-                <li class="layui-nav-item"><a href="">回收站</a></li>
+                <li class="layui-nav-item"><a data-url="/hadoop/fileAndFolder/recyclepage" data-id="/recycler" data-title="回收站" class="site-demo-active" href="javascript:;" data-type="tabAdd">回收站</a></li>
             </ul>
         </div>
     </div>
@@ -70,14 +67,31 @@
 
     function addtap( url,id,title ) {
         var element = layui.element;
-
-        console.log($(".layui-tab-title li[lay-id=" + id + "]").length);
+       var $=layui.jquery;
+        console.log(id);
 
         if ($(".layui-tab-title li[lay-id=" + id + "]").length > 0) {
+            if(id=='-1')
+            {
+                console.log("删除");
+                element.tabDelete('demo', -1); //删除 lay-id="xxx" 的这一项
+                element.tabAdd('demo', {
 
+                    title: '<span>' + title + '</span>',
+
+                    content: '<iframe data-frameid="' + id + '" scrolling="auto" frameborder="0" src="'
+                        + url + '" style="width:100%;height:100%;"></iframe>',
+                    id:id
+
+                });
+                var h = $(window).height();
+                $("iframe").css("height", h + "px");
+                element.tabChange('demo', id);
+            }else
             element.tabChange('demo', id);
 
         } else {
+
             element.tabAdd('demo', {
 
                 title: '<span>' + title + '</span>',
@@ -92,6 +106,13 @@
             element.tabChange('demo', id);
         }
 
+    }
+    function deletetab(index)
+    {
+        var element = layui.element;
+        if ($(".layui-tab-title li[lay-id=" + index+ "]").length > 0) {
+
+        }
     }
 
     //JavaScript代码区域
@@ -150,6 +171,254 @@
             var h = $(window).height();
             $("iframe").css("height", h + "px");
         }
+    });
+</script>
+<script>
+    var userid=[[${userid}]];
+
+    var socket = null;
+    //连接websocket的ip地址
+    var ip = "localhost:8000/hadoop";
+    //动态修改查
+    var im = {
+        init: function () {
+            if ('WebSocket' in window) {
+                var socketUrl = 'ws://'+ip+'/myHandler?myid='+userid;
+                console.log(socketUrl);
+                socket = new WebSocket(socketUrl);
+                im.startListener();
+            } else {
+                alert('当前浏览器不支持WebSocket功能，请更换浏览器访问。');
+            }
+        },
+        startListener: function () {
+            if (socket) {
+                // 连接发生错误的回调方法
+                socket.onerror = function () {
+                    console.log("通讯连接失败!");
+                };
+                // 连接成功建立的回调方法
+                socket.onopen = function (event) {
+                    console.log("通讯连接成功");
+                }
+                // 接收到消息的回调方法
+                socket.onmessage = function (event) {
+                    console.log("通讯接收到消息");
+                    im.handleMessage(event.data);
+                }
+                // 连接关闭的回调方法
+                socket.onclose = function () {
+                    console.log("通讯关闭连接！!");
+                }
+            }
+        },
+        handleMessage: function (msg) {
+            /*username: "纸飞机" //消息来源用户名
+    ,avatar: "http://tp1.sinaimg.cn/1571889140/180/40030060651/1" //消息来源用户头像
+    ,id: "100000" //消息的来源ID（如果是私聊，则是用户id，如果是群聊，则是群组id）
+    ,type: "friend" //聊天窗口来源类型，从发送消息传递的to里面获取
+    ,content: "嗨，你好！本消息系离线消息。" //消息内容
+    ,cid: 0 //消息id，可不传。除非你要对消息进行一些操作（如撤回）
+    ,mine: false //是否我发送的消息，如果为true，则会显示在右方
+    ,fromid: "100000" //消息的发送者id（比如群组中的某个消息发送者），可用于自动解决浏览器多窗口时的一些问题
+    ,timestamp: 1467475443306 //服务端时间戳毫秒数。注意：如果你返回的是标准的 unix 时间戳，记得要 *1000*/
+            //转换格式
+            var layim=layui.layim;
+            console.log(msg);
+            msg = JSON.parse(msg);
+            //如果是群消息，转换一下id，返回群id的的字段必须是id
+            if (msg.type == "group") {
+                var temId = msg.id;
+                msg.id = msg.toId;
+                msg.toId = temId;
+            }
+            layim.getMessage(msg);
+        }
+    };
+    im.init();
+    layui.use('layim', function(layim){
+
+        //演示自动回复
+
+        //基础配置
+        layim.config({
+
+            //初始化接口
+            init: {
+                url: '/hadoop/layim/init?userid='+userid
+                ,data: {}
+            }
+            //或采用以下方式初始化接口
+            /*
+            ,init: {
+              mine: {
+                "username": "LayIM体验者" //我的昵称
+                ,"id": "100000123" //我的ID
+                ,"status": "online" //在线状态 online：在线、hide：隐身
+                ,"remark": "在深邃的编码世界，做一枚轻盈的纸飞机" //我的签名
+                ,"avatar": "a.jpg" //我的头像
+              }
+              ,friend: []
+              ,group: []
+            }
+            */
+            //查看群员接口
+            ,members: {
+                url: 'json/getMembers.json'
+                ,data: {}
+            }
+
+            //上传图片接口
+            ,uploadImage: {
+                url: '/upload/image' //（返回的数据格式见下文）
+                ,type: '' //默认post
+            }
+
+            //上传文件接口
+            ,uploadFile: {
+                url: '/upload/file' //（返回的数据格式见下文）
+                ,type: '' //默认post
+            }
+
+            ,isAudio: true //开启聊天工具栏音频
+            ,isVideo: true //开启聊天工具栏视频
+
+            //扩展工具栏
+            ,tool: [{
+                alias: 'code'
+                ,title: '代码'
+                ,icon: '&#xe64e;'
+            }]
+
+            //,brief: true //是否简约模式（若开启则不显示主面板）
+
+            //,title: 'WebIM' //自定义主面板最小化时的标题
+            //,right: '100px' //主面板相对浏览器右侧距离
+            //,minRight: '90px' //聊天面板最小化时相对浏览器右侧距离
+            ,initSkin: '5.jpg' //1-5 设置初始背景
+            //,skin: ['aaa.jpg'] //新增皮肤
+            //,isfriend: false //是否开启好友
+            //,isgroup: false //是否开启群组
+            //,min: true //是否始终最小化主面板，默认false
+            ,notice: true //是否开启桌面消息提醒，默认false
+            //,voice: false //声音提醒，默认开启，声音文件为：default.mp3
+
+            ,msgbox:'/hadoop/index/msgbox' //消息盒子页面地址，若不开启，剔除该项即可
+            ,find: '/hadoop/index/find?userid='+userid //发现页面地址，若不开启，剔除该项即可
+            ,chatLog: '/hadoop/index/chatlog' //聊天记录页面地址，若不开启，剔除该项即可
+        });
+
+
+
+        //监听在线状态的切换事件
+        layim.on('online', function(data){
+            //console.log(data);
+        });
+
+        //监听签名修改
+        layim.on('sign', function(value){
+            //console.log(value);
+        });
+
+        //监听自定义工具栏点击，以添加代码为例
+        layim.on('tool(code)', function(insert){
+            layer.prompt({
+                title: '插入代码'
+                ,formType: 2
+                ,shade: 0
+            }, function(text, index){
+                layer.close(index);
+                insert('[pre class=layui-code]' + text + '[/pre]'); //将内容插入到编辑器
+            });
+        });
+
+
+
+        //监听发送消息
+        layim.on('sendMessage', function(data){
+            let $ = layui.jquery;
+            console.log(data);
+            //接收消息人员信息
+            var To = data.to;
+            var mine = data.mine;
+            //添加接收消息方的id
+            mine.toId = To.id;
+            //添加接收方与己方的关系（Friend 或 group）
+            mine.type = To.type;
+            // 设置显示在接收方消息的显示位置在左
+            mine["mine"] = false;
+            var msg = JSON.stringify(mine);
+
+            //保存消息
+             $.ajax({
+                  url: '/hadoop/friendAndGroup/addMessage',
+                  data: {"objects": msg},
+                  dataType: 'json',
+                  success: function (json) {
+                      if (message.code === 1) {
+                          layer.msg(message.msg, {
+                              icon: 2,
+                              time: 1500
+                          });
+                      }
+                  },
+                  error: function () {
+                      layer.msg('系统出错,请联系管理员');
+                  }
+
+              });
+
+            socket.send(msg);
+
+        });
+
+        //监听查看群员
+        layim.on('members', function(data){
+            //console.log(data);
+        });
+
+        //监听聊天窗口的切换
+        layim.on('chatChange', function(res){
+            var type = res.data.type;
+            console.log(res.data.id);
+
+            if(type === 'friend'){
+                //模拟标注好友状态
+                //layim.setChatStatus('<span style="color:#FF5722;">在线</span>');
+            } else if(type === 'group'){
+                //模拟系统消息
+
+            }
+
+        });
+        //监听layim建立就绪
+        layim.on('ready', function(res){
+            let $ = layui.jquery;
+            //获取未读的消息
+            $.ajax({
+                url: '/hadoop/layim/getNoReadMessage',
+                success: function (json) {
+                    var list=json.data;
+                    for(var i=0;i<list.length;i++)
+                    {
+                        layim.getMessage(list[i]);
+                    }
+
+                },
+                error: function () {
+                    layer.msg('系统出错,请联系管理员');
+                }
+
+            });
+
+            //
+
+            layim.msgbox(5); //模拟消息盒子有新消息，实际使用时，一般是动态获得
+
+
+
+        }, 3000);
+
     });
 </script>
 </body>

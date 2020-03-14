@@ -9,13 +9,13 @@
     <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all">
     <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
     <script src="../static/layui-v2.2.5/layui.js"></script>
-    <script src="../static/js/jquery.min.js"></script>
 </head>
 <body>
 <div class="demo-tree demo-tree-box" id="demo1"></div>
 <script>
     function getdata() {
         var data = [];
+        var $=layui.jquery;
         $.ajax({
             url: "/hadoop/fileAndFolder/treeload",    //后台数据请求地址
             type: "post",

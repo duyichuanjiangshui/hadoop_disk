@@ -1,6 +1,7 @@
 package com.liangrui.hadoop_disk.mapper;
 
 import com.liangrui.hadoop_disk.bean.entity.Groupnumber;
+import java.util.List;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 @Mapper
@@ -45,4 +46,17 @@ public interface GroupnumberMapper {
         "where id = #{id,jdbcType=INTEGER}"
     })
     int updateByPrimaryKey(Groupnumber record);
+    @Select("select * from groupnumber where userId = #{userid}")
+    List<Groupnumber> findAllGroupnumberbyuserid(int userid);
+    @Select("select * from groupnumber where groupId = #{groupid}")
+    List<Groupnumber> findAllGroupnumberbyGroupid(int groupid);
+
+    @Select("select id from groupnumber where groupId = #{groupid} and userId = #{userid}")
+    Integer findbygrouidanduserid(int groupid,int userid);
+
+    @Delete("delete from groupnumber where groupId = #{groupid} and userId = #{userid}")
+    int deleteGroupUser(int groupid,int userid);
+
+    @Delete("delete from groupnumber where groupId = #{groupid}")
+    int deleteAllGroupUser(int groupid);
 }

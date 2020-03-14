@@ -9,12 +9,12 @@
     <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all">
     <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
     <script src="../static/layui-v2.2.5/layui.js"></script>
-    <script src="../static/js/jquery.min.js"></script>
 </head>
 <body>
 <div class="demo-tree demo-tree-box" id="demo1"></div>
 <script>
 function getdata() {
+    var $=layui.jquery;
     var data = [];
     $.ajax({
         url: "/hadoop/fileAndFolder/treeload",    //后台数据请求地址
@@ -41,7 +41,6 @@ return data;
             ,nodes: getdata()
             ,spread: false
             ,click: function(item){ //点击节点回调
-                var folderid=[[${folderid}]];
                 var type=[[${type}]];
                 var altertype=[[${altertype}]];
                 var confirmMess='';
@@ -52,7 +51,7 @@ return data;
                 layer.confirm(confirmMess, function (index) {
                     $.ajax({
                         type: "POST",
-                        url: "/hadoop/fileAndFolder/copyormove?altertype="+altertype+"&folderid="+folderid+"&type="+type+"&aimFolderid="+item.id,
+                        url: "/hadoop/fileAndFolder/copyormove?altertype="+altertype+"&folderid=[[${folderid}]]&type="+type+"&aimFolderid="+item.id,
                         contentType: "application/json;charset=utf-8",
                         success: function (message) {
                             // 获得frame索引

@@ -2,7 +2,6 @@ package com.liangrui.hadoop_disk.bean.dto;
 
 import com.liangrui.hadoop_disk.bean.entity.Folder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FolderDto extends Folder {

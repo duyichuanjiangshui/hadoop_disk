@@ -1,13 +1,58 @@
 package com.liangrui.hadoop_disk.bean.dto;
 
 public class FileAndFolderDto {
-    private int id;
+    private String id;
     private String name;
     private String updatetime;
     private float size;
     private String filetype;
     private int type;
     private int sharetype;
+    private String fatherfoldername;
+    private String fatherfolderid;
+    private String deltetime;
+    private int userid;
+    private  String username;
+
+    public int getUserid() {
+        return userid;
+    }
+
+    public void setUserid(int userid) {
+        this.userid = userid;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getDeltetime() {
+        return deltetime;
+    }
+
+    public void setDeltetime(String deltetime) {
+        this.deltetime = deltetime;
+    }
+
+    public String getFatherfolderid() {
+        return fatherfolderid;
+    }
+
+    public void setFatherfolderid(String fatherfolderid) {
+        this.fatherfolderid = fatherfolderid;
+    }
+
+    public String getFatherfoldername() {
+        return fatherfoldername;
+    }
+
+    public void setFatherfoldername(String fatherfoldername) {
+        this.fatherfoldername = fatherfoldername;
+    }
 
     public int getSharetype() {
         return sharetype;
@@ -25,11 +70,11 @@ public class FileAndFolderDto {
         this.filetype = filetype;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

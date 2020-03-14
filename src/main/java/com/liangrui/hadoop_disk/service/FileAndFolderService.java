@@ -6,23 +6,29 @@ import com.liangrui.hadoop_disk.bean.dto.FolderDto;
 import java.util.List;
 
 public interface FileAndFolderService {
-    List<FileAndFolderDto> findAllFileAndFolder(int fatherFolderid,int userid);
-    int addFolder(String filename,int fatherFolderid,int userid);
-    boolean isexist(String foldername, int userid,int fatherFolderid);
-    int delteFolder(int folderid);
-    int updateFoler(String foldername, int folderid);
-    int changesharetype(int sharetype,int type,int fileid);
-    boolean isexistfile(String filename, int userid,int fatherFolderid);
+    List<FileAndFolderDto> findAllFileAndFolder(String fatherFolderid);
+    int addFolder(String filename, String fatherFolderid, int userid);
+    boolean isexist(String foldername, String fatherFolderid);
+    int delteFolder(String folderid);
+    int updateFoler(String foldername, String folderid);
+    int changesharetype(int sharetype, int type, String fileid);
+    boolean isexistfile(String filename, String fatherFolderid);
     int updateFileName(String filname, int fileid);
     int deleteFile(int fileid);
     List<FolderDto> getFolderTree(int userid);
-    int copyFolder(int folderid ,int aimFolderid,int userid);
-    int copyFile(int folderid ,int aimFolderid,int userid);
-    int moverFileAndFolder(int folderid ,int type,int aimFolderid);
+    int copyFolder(String folderid , String aimFolderid, int userid);
+    int copyFile(String folderid , String aimFolderid, int userid);
+    int moverFileAndFolder(String folderid , int type, String aimFolderid);
     //判断文件夹是否是其目的文件夹的本身或者夫文件夹
-    boolean isfatherFolder(int folderid , int aimFolderid, int userid);
-    boolean canmoveorcopy(int folderid ,int type, int altertype,int aimFolderid,int userid);
-    boolean allcanmoveorcopy(List<FileAndFolderDto> list,int userid,int aimFolderid);
-    boolean isexitMoveOrCopyNmae(int folderid ,int type, int altertype,int aimFolderid,int userid);
-    boolean isexitMoveOrCopyNmaeinlist(List<FileAndFolderDto> list,int userid,int aimFolderid, int altertype);
+    boolean isfatherFolder(String folderid , String aimFolderid, int userid);
+    boolean canmoveorcopy(String folderid , int type, int altertype, String aimFolderid, int userid);
+    boolean allcanmoveorcopy(List<FileAndFolderDto> list, int userid, String aimFolderid);
+    boolean isexitMoveOrCopyNmae(String folderid , int type, String aimFolderid, int userid);
+    boolean isexitMoveOrCopyNmaeinlist(List<FileAndFolderDto> list, int userid, String aimFolderid);
+     List<FileAndFolderDto> findByLikeName(int userid,String name,String rootFolderid);
+    List<FileAndFolderDto> findByFiltype(int userid,int type,String rootFolderid);
+    List<FileAndFolderDto> findalonefileByFiltype(int userid,int type,String name,String rootname);
+    public List<FileAndFolderDto> findrecyclerfile(int userid,String rootfolderid);
+    int delterecycle(int userid, String fileOrFolderid, int type);//是文件还是文件夹
+    int recycle(int userid, String folderid, int type);
 }

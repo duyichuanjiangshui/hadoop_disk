@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>登录</title>
+    <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all"/>
+    <link rel="stylesheet" href="../static/css/login.css"/>
+
+</head>
+
+<body class="beg-login-bg">
+<input id="loginfail" style="display: none" th:value="${flag}">
+<div class="beg-login-box">
+    <header>
+        <h1>登录</h1>
+    </header>
+    <div class="beg-login-main">
+        <form action="/hadoop/user/login" class="layui-form">
+            <div class="layui-form-item">
+                <label class="beg-login-icon">
+                    <i class="layui-icon">&#xe612;</i>
+                </label>
+                <input type="text" id="userName" name="name"  autocomplete="off"
+                       placeholder="这里输入登录名" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <label class="beg-login-icon">
+                    <i class="layui-icon">&#xe642;</i>
+                </label>
+                <input type="password" name="password" lay-verify="password" autocomplete="off"
+                       placeholder="这里输入密码" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <div class="beg-pull-left beg-login-remember">
+                    <label></label>
+                    <a id="forget_pass"><label style="color: whitesmoke;">忘记密码？</label> </a>
+                </div>
+                <div class="beg-pull-right">
+                    <button class="layui-btn layui-btn-primary" lay-submit lay-filter="login" id="loginbtn">
+                        <i class="layui-icon">&#xe650;</i> 登录
+                    </button>
+                </div>
+                <div class="beg-clear"></div>
+            </div>
+        </form>
+    </div>
+    <footer>
+        <p>Beginner © 吾爱小白</p>
+    </footer>
+</div>
+<script type="text/javascript" src="../static/layui-v2.2.5/layui.all.js"></script>
+<script>
+    layui.use(['layer'], function () {
+        var layer = layui.layer,
+            $ = layui.jquery
+        if($('#loginfail').val()=="fail"){
+            layer.msg("用户名密码不正确",{icon:5})
+        }
+        $("#loginbtn").click(function () {
+            if ($.trim($('#userName').val()) == "" || $('#userPass').val() == "") {
+                layer.msg("用户名密码不能为空",{icon:5})
+                return false
+            }
+        })
+    });
+</script>
+</body>
+
+</html>

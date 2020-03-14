@@ -13,6 +13,8 @@ public class Resgroup {
 
     private Integer userid;
 
+    private String rootfolder;
+
     public Integer getGroupid() {
         return groupid;
     }
@@ -59,5 +61,13 @@ public class Resgroup {
 
     public void setUserid(Integer userid) {
         this.userid = userid;
+    }
+
+    public String getRootfolder() {
+        return rootfolder;
+    }
+
+    public void setRootfolder(String rootfolder) {
+        this.rootfolder = rootfolder == null ? null : rootfolder.trim();
     }
 }

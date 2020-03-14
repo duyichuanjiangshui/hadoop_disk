@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>更多操作</title>
+    <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
+    <script src="../static/layui-v2.2.5/layui.js"></script>
+</head>
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+
+    #content li{
+        /*margin: 10px;*/
+        /*margin-left:35px;*/
+        margin-bottom:20px;
+        display: inline;
+        float: left;
+        width: 30%;
+        height: 100px;
+    }
+
+    #content li:nth-child(3n+1){
+        margin-left: 3%;
+    }
+    .show_name{
+    }
+</style>
+
+<body>
+<div class="layui-tab layui-tab-card">
+    <ul class="layui-tab-title">
+        <li class="layui-this">好友管理</li>
+        <li>群组管理</li>
+    </ul>
+    <div class="layui-tab-content" >
+
+        <div class="layui-tab-item layui-show"><table id="demo" lay-filter="test"></table></div>
+        <div class="layui-tab-item">
+            <button class="layui-btn layui-btn-sm" id="addBtn">添加群组</button>
+            <table id="demo2" lay-filter="test2"></table></div>
+    </div>
+</div>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除好友</a>
+</script>
+
+
+
+<script type="text/html" id="barDemo2">
+    {{#  if(d.isowner ==1){ }}
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="clear">解散该群</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="update">更改该群</a>
+    {{#  } else { }}
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="drop">退出该群</a>
+    {{#  } }}
+
+</script>
+<script th:inline="javascript">
+    //JavaScript代码区域
+    layui.use(['element', 'layer', 'table'], function () {
+        let element = layui.element;
+        let table = layui.table;
+        let layer = layui.layer;
+        let $ = layui.jquery;
+
+        //第一个实例
+       table.render({
+            id: 'myfriend'
+            , elem: '#demo'
+            , title: "我的好友表"
+            , url: 'http://localhost:8000/hadoop/friendAndGroup/findallfriendDto' //数据接口
+            , cols: [
+                [ //表头
+                    {field: 'name', title: '用户名',align: 'center',templet: function (row) {
+                            return '<img style="border-radius: 5px; display: inline;width:25px; height:25px;" src=\''+row.imgsrc+'\'> <span class="show_name" style="font-size: 24px; color: buttonshadow; margin: 6px; margin-left: 17px;">'+row.name+'</span>'
+                        } }
+                    , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 200, align: "center"}
+
+                ]
+            ]
+        });
+        //监听行工具事件
+        table.render({
+            id: 'mygroup'
+            , elem: '#demo2'
+            , title: "群组表"
+            , url: 'http://localhost:8000/hadoop/friendAndGroup/findallResgroup' //数据接口
+            , cols: [
+                [ //表头
+                    {field: 'name', title: '用户名',align: 'center',templet: function (row) {
+                            return '<img style="border-radius: 5px; display: inline;width:25px; height:25px;" src=\''+row.imgsrc+'\'> <span class="show_name" style="font-size: 24px; color: buttonshadow; margin: 6px; margin-left: 17px;">'+row.name+'</span>'
+                        } }
+                    , {fixed: 'right', title: '操作', toolbar: '#barDemo2', width: 200, align: "center"}
+
+                ]
+            ]
+        });
+
+        table.on('tool(test)', function (obj) {
+            let data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'del') {
+                layer.confirm('确认删除？', function (index) {
+
+                    $.ajax({
+                        url:'http://localhost:8000/hadoop/friendAndGroup/deletefriend',
+                        data: {frendid: data.friendid},
+                        dataType: "json",
+                        success: function (message) {
+                            layer.closeAll('loading');
+                            obj.del();
+                            parent.layui.layim.removeList({
+                                type: 'friend' //或者group
+                                ,id: data.friendid //好友或者群组ID
+                            });
+
+                            layer.msg(message.msg, {
+                                icon: 1,
+                                time: 1500 //2秒关闭（如果不配置，默认是3秒）
+                            });
+                        },
+                        error: function (message) {
+                            console.log(JSON.stringify(message));
+                            layer.msg("删除失败", {
+                                icon: 2,
+                                time: 1500
+                            });
+                        }
+                    });
+                    layer.close(index);
+                    layer.load();
+                });
+            }
+        });
+
+        //头工具栏事件
+        $("#addBtn").click(function () {
+            layer.open({
+                type: 2,
+                title: '添加群组',
+                shadeClose: true,
+                maxmin: true,
+                shade: 0.8,
+                offset: '30px',
+                area: ['90%', '90%'],
+                content: 'http://localhost:8000/hadoop/friendAndGroup/addgroupindex' //iframe的url
+            });
+        });
+        table.on('tool(test2)', function (obj) {
+            let data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'drop') {
+                layer.confirm('确认删除？', function (index) {
+
+                    $.ajax({
+                        url:'http://localhost:8000/hadoop/friendAndGroup/dropgroup',
+                        data: {groupid: data.groupid},
+                        dataType: "json",
+                        success: function (message) {
+                            layer.closeAll('loading');
+                            obj.del();
+                            parent.layui.layim.removeList({
+                                type: 'group' //或者group
+                                ,id: data.groupid //好友或者群组ID
+                            });
+
+                            layer.msg(message.msg, {
+                                icon: 1,
+                                time: 1500 //2秒关闭（如果不配置，默认是3秒）
+                            });
+                        },
+                        error: function (message) {
+                            console.log(JSON.stringify(message));
+                            layer.msg("删除失败", {
+                                icon: 2,
+                                time: 1500
+                            });
+                        }
+                    });
+                    layer.close(index);
+                    layer.load();
+                });
+            }
+            if (obj.event === 'clear') {
+                layer.confirm('确认删除？', function (index) {
+
+                    $.ajax({
+                        url: 'http://localhost:8000/hadoop/friendAndGroup/cleargroup',
+                        data: {groupid: data.groupid},
+                        dataType: "json",
+                        success: function (message) {
+                            layer.closeAll('loading');
+                            obj.del();
+                            parent.layui.layim.removeList({
+                                type: 'group' //或者group
+                                ,id: data.groupid //好友或者群组ID
+                            });
+                            layer.msg(message.msg, {
+                                icon: 1,
+                                time: 1500 //2秒关闭（如果不配置，默认是3秒）
+                            });
+                        },
+                        error: function (message) {
+                            console.log(JSON.stringify(message));
+                            layer.msg("删除失败", {
+                                icon: 2,
+                                time: 1500
+                            });
+                        }
+                    });
+                    layer.close(index);
+                    layer.load();
+                });
+            }
+            if (obj.event === 'update') {
+                layer.open({
+                    type: 2,
+                    title: '添加群组',
+                    shadeClose: true,
+                    maxmin: true,
+                    shade: 0.8,
+                    offset: '30px',
+                    area: ['90%', '90%'],
+                    content: 'http://localhost:8000/hadoop/friendAndGroup/updategroupindex?groupid='+data.groupid //iframe的url
+                });
+            }
+        });
+
+
+    });
+</script>
+</body>
+</html>

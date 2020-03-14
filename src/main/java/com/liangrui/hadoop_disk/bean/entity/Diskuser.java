@@ -3,6 +3,10 @@ package com.liangrui.hadoop_disk.bean.entity;
 public class Diskuser {
     private Integer userid;
 
+    private String rootfolderid;
+
+    private String sign;
+
     private String password;
 
     private String name;
@@ -13,7 +17,7 @@ public class Diskuser {
 
     private String email;
 
-    private Integer type;
+    private Integer statue;
 
     private String createtime;
 
@@ -23,6 +27,22 @@ public class Diskuser {
 
     public void setUserid(Integer userid) {
         this.userid = userid;
+    }
+
+    public String getRootfolderid() {
+        return rootfolderid;
+    }
+
+    public void setRootfolderid(String rootfolderid) {
+        this.rootfolderid = rootfolderid == null ? null : rootfolderid.trim();
+    }
+
+    public String getSign() {
+        return sign;
+    }
+
+    public void setSign(String sign) {
+        this.sign = sign == null ? null : sign.trim();
     }
 
     public String getPassword() {
@@ -65,12 +85,12 @@ public class Diskuser {
         this.email = email == null ? null : email.trim();
     }
 
-    public Integer getType() {
-        return type;
+    public Integer getStatue() {
+        return statue;
     }
 
-    public void setType(Integer type) {
-        this.type = type;
+    public void setStatue(Integer statue) {
+        this.statue = statue;
     }
 
     public String getCreatetime() {

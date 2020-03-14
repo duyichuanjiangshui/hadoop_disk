@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>分享到群组文件夹</title>
+    <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
+    <script src="../static/layui-v2.2.5/layui.js"></script>
+</head>
+<body>
+<div class="demo-tree demo-tree-box" id="demo1"></div>
+<script>
+    function getdata(groupid) {
+        var data = [];
+        var $=layui.jquery;
+        $.ajax({
+            url: "http://localhost:8000/hadoop/share/treeload?groupid="+groupid,    //后台数据请求地址
+            type: "post",
+            datatype:"json",
+            async: false,
+            success: function (resut) {
+                data = resut;
+                console.log(data);
+            }
+        });
+
+        return data;
+    }
+</script>
+<script>
+    //Demo
+    layui.use(['tree', 'layer'], function(){
+        var layer = layui.layer
+            ,$ = layui.jquery;
+        var groupid=[[${groupid}]];
+        //基本演示
+        layui.tree({
+            elem: '#demo1' //指定元素
+            ,nodes: getdata(groupid)
+            ,spread: false
+            ,click: function(item){ //点击节点回调
+                var parent_json = eval('('+parent.json+')');
+                var confirmMess='确认分享到此文件夹';
+                console.log(parent_json);
+                console.log(groupid);
+
+                layer.confirm(confirmMess, function (index) {
+                    $.ajax({
+                        url: "http://localhost:8000/hadoop/share/shareingroup",
+                        contentType: "application/json;charset=utf-8",
+                        data:{"objects":JSON.stringify(parent_json),"aimFolderid":item.id,"groupid":JSON.stringify(groupid)},
+                        success: function (message) {
+
+                            if(message.code===0)
+                            {
+                                var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                                parent.layer.close(index);
+                            }
+                            else  layer.msg(message.msg, {
+                                icon: 2,
+                                time: 1500
+                            });
+                        },
+                        error: function (message) {
+                            layer.msg("失败", {
+                                icon: 2,
+                                time: 1500
+                            });
+                        }
+                    });
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

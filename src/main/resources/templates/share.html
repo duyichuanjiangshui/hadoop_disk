@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>分享文件</title>
+    <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
+    <script src="../static/layui-v2.2.5/layui.js"></script>
+    <script src="../static/js/clipboard.min.js"></script>
+</head>
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+
+    #content li{
+        /*margin: 10px;*/
+        /*margin-left:35px;*/
+        margin-bottom:20px;
+        display: inline;
+        float: left;
+        width: 30%;
+        height: 100px;
+    }
+
+    #content li:nth-child(3n+1){
+        margin-left: 3%;
+    }
+    .show_name{
+    }
+</style>
+
+<body>
+<div class="layui-tab layui-tab-card">
+    <ul class="layui-tab-title">
+        <li class="layui-this">创建分享链接</li>
+        <li>分享到群组</li>
+    </ul>
+    <div class="layui-tab-content" >
+
+        <div class="layui-tab-item layui-show">
+
+            <div id="sharediv" class="layui-form layui-container" style="padding:15px 30px 15px 0;">
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">分享时间：</label>
+                    <div class="layui-input-block">
+                    <input type="radio" name="sharetime" value="7" title="7天">
+                    <input type="radio" name="sharetime" value="30" title="30天" checked>
+                    <input type="radio" name="sharetime" value="0" title="永久" >
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                <label class="layui-form-label">分享密码：</label>
+                <div class="layui-input-block">
+                    <input type="text"  id="password" name="password"  required lay-verify="pass" autocomplete="off"
+                           class="layui-input">
+                </div>
+                </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="add">创建分享链接</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+            </div>
+
+        </div>
+        <div class="layui-tab-item">
+            <table id="demo2" lay-filter="test2"></table></div>
+    </div>
+</div>
+<script type="text/html" id="barDemo2">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="share">分享到该群组</a>
+</script>
+
+
+
+
+
+<script th:inline="javascript">
+    //JavaScript代码区域
+    var json;
+    function getRanNum(){
+
+        var result = [];
+
+        for(var i=0;i<4;i++){
+
+            var ranNum = Math.ceil(Math.random() * 25); //生成一个0到25的数字
+
+            //大写字母'A'的ASCII是65,A~Z的ASCII码就是65 + 0~25;然后调用String.fromCharCode()传入ASCII值返回相应的字符并push进数组里
+
+            result.push(String.fromCharCode(65+ranNum));
+
+        }
+
+        return  result.join('');
+
+    }
+
+    function copyUrl2(url,pasword)
+    {
+
+        var $=layui.jquery;
+        var temp=url+'\n提取码:'+pasword;
+
+
+        var clipboard = new ClipboardJS('.btn', {
+            text: function() {
+                return temp;
+            }
+        });
+        alert("复制成功！");
+
+    }
+
+    layui.use(['element', 'layer', 'table'], function () {
+        var layer = layui.layer
+            ,$ = layui.jquery;
+        var objects=eval('('+parent.json+')');
+        let element = layui.element;
+        let table = layui.table;
+        let form=layui.form;
+        //自定义验证规则
+        var pas=getRanNum();
+        $("#password").val(pas);
+
+
+
+        form.verify({
+           pass: [
+                /^[\S]{4,4}$/
+                ,'密码必须是4位，且不能出现空格'
+            ]
+        });
+
+        //监听提交
+        form.on('submit(add)', function (data) {
+            $.ajax({
+                url: "/hadoop/share/addShareUrl",
+                contentType: "application/json;charset=utf-8",
+                data: {"objects":JSON.stringify(objects),"objects2":JSON.stringify(data.field)},
+                dataType: "json",
+                success: function (message) {
+                    layer.closeAll('loading');
+                    $("#sharediv").empty();
+                    var temp1="<p style='color: darkgrey'>成功创建分享链接</p><br>";
+                    var temp2="<input type='text' class='layui-input layui-inline' readonly='readonly' value='"+message.shareurl+"'><button class='layui-btn layui-inline btn' onclick='copyUrl2(\""+message.shareurl+"\",\""+message.password+"\")'>复制链接及提取码</button><br>";
+                    var temp3="<p style='color: darkgrey' class='layui-inline'>提取码</p><input class='layui-inline layui-input' readonly='readonly' type='text' value='"+message.password+"'>";
+                    $("#sharediv").append(temp1);
+                    $("#sharediv").append(temp2);
+                    $("#sharediv").append(temp3);
+                },
+                error: function (message) {
+                    console.log(JSON.stringify(message));
+                    layer.msg("添加失败", {
+                        icon: 2,
+                        time: 1500
+                    });
+                }
+            });
+            layer.load();
+            return false; // 禁用页面跳转
+        });
+        //监听行工具事件
+        table.render({
+            id: 'mygroup'
+            , elem: '#demo2'
+            , title: "群组表"
+            , url: 'http://localhost:8000/hadoop/friendAndGroup/findallResgroup' //数据接口
+            , cols: [
+                [ //表头
+                    {field: 'name', title: '群组名',align: 'center',templet: function (row) {
+                            return '<img style="border-radius: 5px; display: inline;width:25px; height:25px;" src=\''+row.imgsrc+'\'> <span class="show_name" style="font-size: 24px; color: buttonshadow; margin: 6px; margin-left: 17px;">'+row.name+'</span>'
+                        } }
+                    , {fixed: 'right', title: '操作', toolbar: '#barDemo2', width: 200, align: "center"}
+
+                ]
+            ]
+        });
+
+        table.on('tool(test2)', function (obj) {
+            let data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'share') {
+                json=JSON.stringify(objects);
+                layer.open({
+                    type: 2,
+                    title: '请选择文件夹',
+                    shadeClose: true,
+                    shade: 0.8,
+                    offset: '30px',
+                    area: ['95%', '95%'],
+                    content: "http://localhost:8000/hadoop/share/groupfolder?groupid="+data.groupid//iframe的url
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

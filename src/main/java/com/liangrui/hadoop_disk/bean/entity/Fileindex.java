@@ -3,7 +3,9 @@ package com.liangrui.hadoop_disk.bean.entity;
 public class Fileindex {
     private Integer fileid;
 
-    private Integer fatherfolder;
+    private String fatherfolderid;
+
+    private Integer groupid;
 
     private Integer uploadlocationid;
 
@@ -17,11 +19,15 @@ public class Fileindex {
 
     private Integer userid;
 
+    private String deletetime;
+
     private Integer sharetype;
 
     private Integer savenum;
 
     private String filetype;
+
+    private Integer sortype;
 
     private Integer isdelete;
 
@@ -33,12 +39,20 @@ public class Fileindex {
         this.fileid = fileid;
     }
 
-    public Integer getFatherfolder() {
-        return fatherfolder;
+    public String getFatherfolderid() {
+        return fatherfolderid;
     }
 
-    public void setFatherfolder(Integer fatherfolder) {
-        this.fatherfolder = fatherfolder;
+    public void setFatherfolderid(String fatherfolderid) {
+        this.fatherfolderid = fatherfolderid == null ? null : fatherfolderid.trim();
+    }
+
+    public Integer getGroupid() {
+        return groupid;
+    }
+
+    public void setGroupid(Integer groupid) {
+        this.groupid = groupid;
     }
 
     public Integer getUploadlocationid() {
@@ -89,6 +103,14 @@ public class Fileindex {
         this.userid = userid;
     }
 
+    public String getDeletetime() {
+        return deletetime;
+    }
+
+    public void setDeletetime(String deletetime) {
+        this.deletetime = deletetime == null ? null : deletetime.trim();
+    }
+
     public Integer getSharetype() {
         return sharetype;
     }
@@ -111,6 +133,14 @@ public class Fileindex {
 
     public void setFiletype(String filetype) {
         this.filetype = filetype == null ? null : filetype.trim();
+    }
+
+    public Integer getSortype() {
+        return sortype;
+    }
+
+    public void setSortype(Integer sortype) {
+        this.sortype = sortype;
     }
 
     public Integer getIsdelete() {

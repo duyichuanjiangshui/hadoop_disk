@@ -1,9 +1,11 @@
 package com.liangrui.hadoop_disk.bean.entity;
 
 public class Folder {
-    private Integer folderid;
+    private String folderid;
 
-    private Integer fatherfolderid;
+    private String fatherfolderid;
+
+    private Integer groupid;
 
     private String name;
 
@@ -17,20 +19,30 @@ public class Folder {
 
     private Integer isdelete;
 
-    public Integer getFolderid() {
+    private String deletetime;
+
+    public String getFolderid() {
         return folderid;
     }
 
-    public void setFolderid(Integer folderid) {
-        this.folderid = folderid;
+    public void setFolderid(String folderid) {
+        this.folderid = folderid == null ? null : folderid.trim();
     }
 
-    public Integer getFatherfolderid() {
+    public String getFatherfolderid() {
         return fatherfolderid;
     }
 
-    public void setFatherfolderid(Integer fatherfolderid) {
-        this.fatherfolderid = fatherfolderid;
+    public void setFatherfolderid(String fatherfolderid) {
+        this.fatherfolderid = fatherfolderid == null ? null : fatherfolderid.trim();
+    }
+
+    public Integer getGroupid() {
+        return groupid;
+    }
+
+    public void setGroupid(Integer groupid) {
+        this.groupid = groupid;
     }
 
     public String getName() {
@@ -79,5 +91,13 @@ public class Folder {
 
     public void setIsdelete(Integer isdelete) {
         this.isdelete = isdelete;
+    }
+
+    public String getDeletetime() {
+        return deletetime;
+    }
+
+    public void setDeletetime(String deletetime) {
+        this.deletetime = deletetime == null ? null : deletetime.trim();
     }
 }

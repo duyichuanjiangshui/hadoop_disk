@@ -10,28 +10,30 @@
     <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
     <script src="../static/layui-v2.2.5/layui.js"></script>
     <link rel="stylesheet" href="../static/layui-v2.2.5/extend/dropdown.css" media="all">
-    <script src="../static/js/jquery.min.js"></script>
 </head>
 <body>
 
 <div>
     <button class="layui-btn layui-btn-primary" type="button" id="uploadfile">
-        <i class="layui-icon" style="font-size: 30px; color: #1E9FFF;">&#xe688;</i>上传</button>
+        <i class="layui-icon" style="font-size: 30px; color: #1E9FFF;">&#xe688;</i>上传
+    </button>
     <button class="layui-btn layui-btn-primary" type="button" id="addFolder">
-        <i class="layui-icon" style="font-size: 30px; color: #1E9FFF;">&#xe628;</i>新建文件夹</button>
+        <i class="layui-icon" style="font-size: 30px; color: #1E9FFF;">&#xe628;</i>新建文件夹
+    </button>
 
     <div class="layui-inline">
         <div class="layui-btn-group">
-            <button class="layui-btn " type="button" id="share" >分享</button>
-            <button class="layui-btn" type="button"> <i class="layui-icon" style="font-size:
-            30px; color: #1E9FFF;">&#xe689;</i>离线下载</button>
+            <button class="layui-btn " type="button" id="share">分享</button>
             <button class="layui-btn" type="button" id="deleteall">删除</button>
             <button class="layui-btn" type="button" id="moveall">移动到</button>
             <button class="layui-btn" type="button" id="copyall">复制到</button>
         </div>
-        <div class="layui-btn-group">
-
     </div>
+    <div class="layui-inline" style="float: right">
+    <div class="layui-inline"><input name="kws" class="layui-input" placeholder="搜索 文件名"
+                                     autocomplete="off" id="seaarchtxt"></div>
+    <button class="layui-btn" id="search"><i class="layui-icon layui-icon-search"></i></button>
+</div>
 </div>
 </div>
 <div class="layui-container layui-side-scroll" style="margin: 0; width: 100%; padding: 5px 15px;">
@@ -41,136 +43,168 @@
         </div>
     </div>
 </div>
+<!--用隐藏表单实现下载-->
+<form action="" id="fileForm" method="post" style="display: none;"></form>
 <script type="text/html" id="barDemo">
     <div class="urp-dropdown urp-dropdown-table">
-        <a class="layui-btn layui-btn-xs" lay-event="shaare">分享</a>
+        <a class="layui-btn layui-btn-xs" lay-event="share">分享</a>
+        {{# if(d.type!=0){ }}
         <a class="layui-btn layui-btn-xs" lay-event="down">下载</a>
+        {{# } }}
         <button class="layui-btn layui-btn-primary layui-btn-xs urp-dropdown-btn">
             <i class="layui-icon layui-icon-down">&#xe65f;</i>
         </button>
     </div>
 </script>
 <script th:inline="javascript">
+    var json;
     //将以下代码粘入相关页面中
-    function changeFileStatus(sharetype, fileid,type) {
-                $.ajax({
-                    url: "/hadoop/fileAndFolder/changefileStaus?sharetype="+sharetype+"&folderid="+fileid+"&type="+type,
-                    method: "post",
-                    beforeSend:function(){
-                        $("#icon_loading").html("<span class='layui-icon layui-icon-loading'></span>");
-                    },
-                    complete: function(){
-                        // alert('远程调用成功，状态文本值：'+textStatus);
-                        $("#icon_loading").empty();
-                    },
-                    success: function (data) {
+    function preview(fileindexid, filetype, size, filename) {
+        var allow = "doc,docx,ppt,pptx,xls,xlsx,mp4,mp3,txt,java,php,py,md,js,css,jpg,jpeg,png,gif";
+        var allows = allow.split(",");
+        console.log(filetype);
+        if (size > 20000000) {
+            layer.alert("文件太大不支持预览");
+        } else {
+            var flag = 0;//标记没有允许的类型
+            for (var i = 0; i < allows.length; i++) {
+                if (allows[i] == filetype) {
+                    flag = 1;
+                    break;
+                }
+            }
+            if (flag === 1) {
+                var originUrl = 'http://127.0.0.1:8000/hadoop/uploadAndDown/down?fileindexid=' + fileindexid + '&fullfilename=' + filename;
 
-                    }, error: function () {
-                        layer.msg('请求服务器失败！', {icon: 2});
-                    }
-                });
+                window.open('http://127.0.0.1:8012/onlinePreview?url=' + encodeURIComponent(originUrl));
+            } else {
+                layer.alert("该文件类型不允许预览");
+            }
+        }
+
     }
+
+    function changeFileStatus(sharetype, fileid, type) {
+        $.ajax({
+            url: "/hadoop/fileAndFolder/changefileStaus?sharetype=" + sharetype + "&folderid=" + fileid + "&type=" + type,
+            method: "post",
+            beforeSend: function () {
+                $("#icon_loading").html("<span class='layui-icon layui-icon-loading'></span>");
+            },
+            complete: function () {
+                // alert('远程调用成功，状态文本值：'+textStatus);
+                $("#icon_loading").empty();
+            },
+            success: function (data) {
+
+            }, error: function () {
+                layer.msg('请求服务器失败！', {icon: 2});
+            }
+        });
+    }
+
     layui.config({
         base: "../static/layui-v2.2.5/lay/mymodules/"
-    }).use(['element', 'layer', 'table','dropdown'], function(){
+    }).use(['element', 'layer', 'table', 'dropdown'], function () {
+
         let element = layui.element;
         let table = layui.table;
         let layer = layui.layer;
         let dropdown = layui.dropdown;
         let $ = layui.jquery;//表格插件;
-        var fatherFolderid=[[${fatherFolderid}]];
-        table.render({
+
+        var tableIns = table.render({
             elem: '#demo'
-            ,id:'fileAndFolder'
-            ,cellMinWidth: 80
-            ,url:'/hadoop/fileAndFolder/allFolder?fatherFolder='+fatherFolderid
-            ,cols: [
+            , id: 'fileAndFolder'
+            , cellMinWidth: 80
+            , url: '/hadoop/fileAndFolder/allFolder?fatherFolder=' + [[${fatherFolderid}]]
+            , cols: [
                 [
                     {title: '选择', width: 36, type: 'checkbox', fixed: 'left'},
-                    {field: 'type', align: 'center', width: 50, templet: function (row) {
-                            if (row.type === 0)
-                            {
+                    {
+                        field: 'type', align: 'center', width: 50, templet: function (row) {
+                            if (row.type === 0) {
                                 return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe737;</i>";
-                            }else{
-                                if(row.filetype==="rar"||row.filetype==="zip")
-                                return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe634;</i>";
-                                else  if(row.filetype==="mp4"||row.filetype==="mov")
+                            } else {
+                                if (row.filetype === "rar" || row.filetype === "zip")
+                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe634;</i>";
+                                else if (row.filetype === "mp4" || row.filetype === "mov")
                                     return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe66f;</i>";
-                                else  if(row.filetype==="pdf")
+                                else if (row.filetype === "pdf")
                                     return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8e8;</i>";
-                                else  if(row.filetype==="mps"||row.filetype==="wma")
+                                else if (row.filetype === "mps" || row.filetype === "wma")
                                     return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe602;</i>";
-                                else  if(row.filetype==="txt")
+                                else if (row.filetype === "txt")
                                     return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe63b;</i>";
-                                else  if(row.filetype==="docx")
+                                else if (row.filetype === "docx")
                                     return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8ac;</i>";
-                                else  if(row.filetype==="exe")
+                                else if (row.filetype === "exe")
                                     return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8ac;</i>";
-                                else  if(row.filetype==="apk")
+                                else if (row.filetype === "apk")
                                     return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe68d;</i>";
                                 else
                                     return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe65b;</i>";
 
 
                             }
-                        }}
-                ,{field:'name', title: '文件名', sort: true,templet: function (row) {
-                    if(row.type===0)
-                    {
-                        return "<a onclick='top.addtap(\"/hadoop/fileAndFolder/allFile?fatherFolderid="+row.id+"\","+row.id+",\""+row.name+"\")'>"+row.name+"</a>";
-                    }else
-                    {
-                        return (row.name);
-                    }
-
-                    }}
-                ,{field:'size', title: '大小',sort: true,templet: function (row) {
-                        if (row.size === 0)
-                        {
-                            return "- -";
-                        }else{
-                            return (row.size)+" kb";
                         }
-                    }}
-                ,{field:'updatetime',  title: '修改日期', sort: true},
+                    }
+                    , {
+                    field: 'name', title: '文件名', sort: true, templet: function (row) {
+                        if (row.type === 0) {
+                            return "<a onclick='top.addtap(\"/hadoop/fileAndFolder/allFile?fatherFolderid=" + row.id + "\",\"" + row.id.toString() + "\",\"" + row.name + "\")'>" + row.name + "</a>";
+                        } else {
+                            return "<a onclick='preview(" + row.id + ",\"" + row.filetype + "\"," + row.size + ",\"" + row.name + "\")'>" + row.name + "</a>";
+                        }
+
+                    }
+                }
+                    , {
+                    field: 'size', title: '大小', sort: true, templet: function (row) {
+                        if (row.size === 0) {
+                            return "- -";
+                        } else {
+                            return (row.size) + " kb";
+                        }
+                    }
+                }
+                    , {field: 'updatetime', title: '修改日期', sort: true},
                     {
                         field: "sharetype", title: "分享类型", width: 100, align: "center",
                         templet: function (row) {
                             if (row.sharetype === 1)
-                                return "<a href='javascript:changeFileStatus(0," + row.id +","+row.type+ ")'>" +
+                                return "<a href='javascript:changeFileStatus(0," + row.id + "," + row.type + ")'>" +
                                     "<input name='role'   type='checkbox' lay-skin='switch'   lay-text='共享|私有' value='1' checked></a>";
                             else
-                                return "<a href='javascript:changeFileStatus(1," + row.id +","+row.type+ ")'>" +
+                                return "<a href='javascript:changeFileStatus(1," + row.id + "," + row.type + ")'>" +
                                     "<input name='role'  type='checkbox' lay-skin='switch'  lay-text='共享|私有' value='0'></a>";
 
                         }
                     }
                     , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150, align: "center"}
-            ]
-            ],done: function(res) {
-                dropdown(res.data,function(data) {
+                ]
+            ], done: function (res) {
+                dropdown(res.data, function (data) {
                     var options = [
                         {
                             title: "重名名",
-                            event: function() {
+                            event: function () {
                                 layer.prompt({
                                     formType: 2
-                                    ,value: data.name,
+                                    , value: data.name,
                                     title: '请输入新文件夹名'
-                                }, function(value, index){
+                                }, function (value, index) {
                                     $.ajax({
                                         type: "POST",
-                                        url: "/hadoop/fileAndFolder/renameFolder?filename="+value+"&folderid="+data.id+"&type="+data.type,
+                                        url: "/hadoop/fileAndFolder/renameFolder?filename=" + value + "&folderid=" + data.id + "&type=" + data.type,
                                         contentType: "application/json;charset=utf-8",
                                         success: function (message) {
                                             // 获得frame索引
                                             console.log(message.code);
-                                            if(message.code===0)
-                                            {
+                                            if (message.code === 0) {
                                                 layui.table.reload('fileAndFolder');
                                                 layer.close(index);
-                                            }
-                                            else  layer.msg(message.msg, {
+                                            } else layer.msg(message.msg, {
                                                 icon: 2,
                                                 time: 1500
                                             });
@@ -187,11 +221,11 @@
                         },
                         {
                             title: "删除",
-                            event: function() {
+                            event: function () {
                                 layer.confirm('确认删除？', function (index) {
                                     console.log(data.id);
                                     $.ajax({
-                                        url: "/hadoop/fileAndFolder/delFolder?folderid="+data.id+"&type="+data.type,
+                                        url: "/hadoop/fileAndFolder/delFolder?folderid=" + data.id + "&type=" + data.type,
                                         success: function (message) {
                                             layer.close(index);
                                             layui.table.reload('fileAndFolder');
@@ -212,7 +246,7 @@
                         {
                             title: "复制到",
 
-                            event: function() {
+                            event: function () {
                                 layer.open({
                                     type: 2,
                                     title: '请选择文件夹',
@@ -220,7 +254,7 @@
                                     shade: 0.8,
                                     offset: '30px',
                                     area: ['80%', '60%'],
-                                    content: "/hadoop/fileAndFolder/onlyfolder?folderid="+data.id+"&type="+data.type+"&altertype=0"//iframe的url
+                                    content: "/hadoop/fileAndFolder/onlyfolder?folderid=" + data.id + "&type=" + data.type + "&altertype=0"//iframe的url
                                 });
 
                             }
@@ -229,7 +263,7 @@
                         {
                             title: "移动到",
 
-                            event: function() {
+                            event: function () {
                                 layer.open({
                                     type: 2,
                                     title: '请选择文件夹',
@@ -237,7 +271,7 @@
                                     shade: 0.8,
                                     offset: '30px',
                                     area: ['80%', '60%'],
-                                    content: "/hadoop/fileAndFolder/onlyfolder?folderid="+data.id+"&type="+data.type+"&altertype=1"//iframe的url
+                                    content: "/hadoop/fileAndFolder/onlyfolder?folderid=" + data.id + "&type=" + data.type + "&altertype=1"//iframe的url
                                 });
 
                             }
@@ -245,20 +279,40 @@
                     ];
 
                     return options;
-                })
+                });
             }
+
         });
         table.on('tool(test)', function (obj) {
+
             let data = obj.data;
+
             //console.log(obj)
+
             if (obj.event === 'down') {
+                var url="http://127.0.0.1:8000/hadoop/uploadAndDown/down?fileindexid="+data.id;//下载文件url
+                $("#fileForm").attr('action',url);
+
+                $("#fileForm").submit();
 
             }
+
             else  if(obj.event==='share')
+
             {
+                json = '['+JSON.stringify(data)+']';
+                console.log(json);
+                layer.open({
+                    type: 2,
+                    title: '请选则共享',
+                    shadeClose: true,
+                    shade: 0.8,
+                    offset: '30px',
+                    area: ['80%', '60%'],
+                    content: "/hadoop/share/sharePage" //iframe的url
+                });
 
             }
-
         });
     });
 
@@ -266,16 +320,15 @@
 
 <script>
     //这里设置一个空的json串，用于接受表格的行信息
-var json;
+    var json;
     layui.config({
         base: "../static/layui-v2.2.5/lay/mymodules/"
-    }).use(['element', 'layer', 'table','dropdown'], function(){
+    }).use(['element', 'layer', 'table', 'dropdown'], function () {
         let element = layui.element;
         let table = layui.table;
         let layer = layui.layer;
         let dropdown = layui.dropdown;
         let $ = layui.jquery;//表格插件;
-        var fatherFolderid=[[${fatherFolderid}]];
 
 //layer.msg("大家好，这是最简单的弹层", { time: 9000, type: 1,title:['测试一下','font-size:18px'] });
         $("#addFolder").click(function () {
@@ -284,22 +337,20 @@ var json;
                 formType: 2,
                 value: '新建文件夹',
                 title: '请输入文件夹名',
-            }, function(value, index, elem){
+            }, function (value, index, elem) {
 
                 //console.log(fatherFolderid+value);
                 $.ajax({
                     type: "POST",
-                    url: "/hadoop/fileAndFolder/addFolder?filename="+value+"&fatherFolderid="+fatherFolderid,
+                    url: "/hadoop/fileAndFolder/addFolder?filename=" + value + "&fatherFolderid=[[${fatherFolderid}]]",
                     contentType: "application/json;charset=utf-8",
                     success: function (message) {
                         // 获得frame索引
                         console.log(message.code);
-                        if(message.code===0)
-                        {
+                        if (message.code === 0) {
                             layui.table.reload('fileAndFolder');
                             layer.close(index);
-                        }
-                        else  layer.msg(message.msg, {
+                        } else layer.msg(message.msg, {
                             icon: 2,
                             time: 1500
                         });
@@ -325,26 +376,39 @@ var json;
                 shade: 0.8,
                 offset: '30px',
                 area: ['85%', '69%'],
-                content:"/hadoop/uploadAndDown/uploadIndex?fatherFolderid="+fatherFolderid //iframe的url
+                content: "/hadoop/uploadAndDown/uploadIndex?fatherFolderid=[[${fatherFolderid}]]" //iframe的url
             });
         });
         $("#share").click(function () {
             var checkStatus = table.checkStatus('fileAndFolder');
-            console.log("dsf");
-            console.log(checkStatus.data);//获取选中行的数据
-            console.log(checkStatus.data.length);//获取选中行数量，可作为是否有选中行的条件
-            console.log(checkStatus.isAll ); //表格是否全选
+            var data = checkStatus.data;
+            if (data.length > 0) {
+                json = JSON.stringify(data);
+                layer.open({
+                    type: 2,
+                    title: '请选择共享',
+                    shadeClose: true,
+                    shade: 0.8,
+                    offset: '30px',
+                    area: ['80%', '60%'],
+                    content: "/hadoop/share/sharePage" //iframe的url
+                });
+            } else {
+                layer.msg("请先选中！！", {
+                    icon: 2,
+                    time: 1500
+                });
+            }
         });
         $("#deleteall").click(function () {
             var checkStatus = table.checkStatus('fileAndFolder');
-            var data=checkStatus.data;
-            if(data.length>0)
-            {
+            var data = checkStatus.data;
+            if (data.length > 0) {
                 layer.confirm('确认删除？', function (index) {
                     $.ajax({
                         url: "/hadoop/fileAndFolder/delall",
                         contentType: "application/json;charset=utf-8",
-                        data:{"objects":JSON.stringify(data)},
+                        data: {"objects": JSON.stringify(data)},
                         success: function (message) {
                             layer.close(index);
                             layui.table.reload('fileAndFolder');
@@ -359,7 +423,7 @@ var json;
                         }
                     });
                 });
-            }else{
+            } else {
                 layer.msg("请先选中！！", {
                     icon: 2,
                     time: 1500
@@ -368,10 +432,9 @@ var json;
         });
         $("#copyall").click(function () {
             var checkStatus = table.checkStatus('fileAndFolder');
-            var data=checkStatus.data;
-            if(data.length>0)
-            {
-                json=JSON.stringify(data);
+            var data = checkStatus.data;
+            if (data.length > 0) {
+                json = JSON.stringify(data);
                 layer.open({
                     type: 2,
                     title: '请选择文件夹',
@@ -381,7 +444,7 @@ var json;
                     area: ['80%', '60%'],
                     content: "/hadoop/fileAndFolder/onlyfolderlist?altertype=0"//iframe的url
                 });
-            }else{
+            } else {
                 layer.msg("请先选中！！", {
                     icon: 2,
                     time: 1500
@@ -390,10 +453,9 @@ var json;
         });
         $("#moveall").click(function () {
             var checkStatus = table.checkStatus('fileAndFolder');
-            var data=checkStatus.data;
-            if(data.length>0)
-            {
-                json=JSON.stringify(data);
+            var data = checkStatus.data;
+            if (data.length > 0) {
+                json = JSON.stringify(data);
                 layer.open({
                     type: 2,
                     title: '请选择文件夹',
@@ -403,12 +465,18 @@ var json;
                     area: ['80%', '60%'],
                     content: "/hadoop/fileAndFolder/onlyfolderlist?altertype=1"//iframe的url
                 });
-            }else{
+            } else {
                 layer.msg("请先选中！！", {
                     icon: 2,
                     time: 1500
                 });
             }
+        });
+        $("#search").click(function () {
+            var text = $("#seaarchtxt").val();
+            console.log(text);
+            top.addtap("/hadoop/fileAndFolder/searchpage?name="+text,-1,"我的搜索");
+            //这里以搜索为例
         });
     });
 </script>

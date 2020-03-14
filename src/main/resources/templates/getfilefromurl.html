@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>主要索引</title>
+    <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
+    <script src="../static/layui-v2.2.5/layui.js"></script>
+</head>
+<style>
+
+    .main{
+
+        position: absolute;
+
+        top: 50%;
+
+        left: 50%;
+
+        transform: translate(-50%, -50%);
+
+
+
+        padding: 1em;
+
+    }
+
+</style>
+<body>
+<div class="layui-layout layui-layout-admin">
+<div class="layui-header">
+    <div class="layui-logo">layui 后台布局</div>
+    <!-- 头部区域（可配合layui已有的水平导航） -->
+    <ul class="layui-nav layui-layout-left">
+        <li class="layui-nav-item"><a href="">网盘</a></li>
+        <li class="layui-nav-item"><a href="">找资源</a></li>
+    </ul>
+    <ul class="layui-nav layui-layout-right">
+        <li class="layui-nav-item">
+            <a href="javascript:;">
+                <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+                贤心
+            </a>
+            <dl class="layui-nav-child">
+                <dd><a href="">基本资料</a></dd>
+                <dd><a href="">安全设置</a></dd>
+            </dl>
+        </li>
+        <li class="layui-nav-item"><a href="">退了</a></li>
+    </ul>
+</div>
+</div>
+    <div  style="top: 50px ;height: 600px ;background-color: #eaeaea" >
+        <!--这是提示信息的div-->
+        <div class="main" id="remaind" style="text-align: center">
+
+        </div>
+        <!--这是验证提取码的div-->
+        <div class="main" id="verify" style="display: none">
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">提取码：</label>
+                    <div class="layui-input-block">
+                        <input type="text"  name="password"  required lay-verify="required" autocomplete="off"
+                        class="layui-input">
+                    </div>
+                </div>
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="add">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+        </div>
+        <div class="layui-inline" style="display: none">
+            <div class="layui-btn-group">
+                <button class="layui-btn" type="button" id="copyall">保存到云盘</button>
+            </div>
+        </div>
+        <div class="layui-container layui-side-scroll" style="margin: 0; width: 100%; padding: 5px 15px;">
+            <div class="layui-row">
+                <div class="layui-col-lg12">
+                    <table id="demo" lay-filter="test"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+<div>
+</div>
+<script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="save">保存</a>
+</script>
+<script>
+    layui.config({
+        base: "../static/layui-v2.2.5/lay/mymodules/"
+    }).use(['element', 'layer', 'table', 'dropdown'],
+        function () {
+            let element = layui.element;
+            let table = layui.table;
+            let layer = layui.layer;
+            let $ = layui.jquery;//表格插件;
+            var flag=[[${flag}]];
+            console.log(flag);
+
+            if(flag==0)
+            {
+                var temp="<p style='color: #1E9FFF;size: B4'>[[${msg}]]</p>";
+                $("#remaind").append(temp);
+            }else {
+                $("#verify").show();
+            }
+
+        });
+</script>
+</body>
+</html>

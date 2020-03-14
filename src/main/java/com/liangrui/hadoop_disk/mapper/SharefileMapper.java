@@ -55,4 +55,7 @@ public interface SharefileMapper {
             "where shareId = #{shareid,jdbcType=INTEGER}"
     })
     int updateByPrimaryKey(Sharefile record);
+
+    @Select("select * from sharefile where shareurl = #{shareurl}")
+    Sharefile fildFileByshareUrl(String shareurl);
 }
