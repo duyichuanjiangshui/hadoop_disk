@@ -11,8 +11,10 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,9 +58,9 @@ public class FolderAndFileController {
     }
     @RequestMapping("/searchbylikename")
     @ResponseBody
-    public Map<String, Object> searchbylikename(PageModel<List<FileAndFolderDto>> page, String name) {
-        int userid = 1;//从session里得
-        String rootFolderid="root";
+    public Map<String, Object> searchbylikename(PageModel<List<FileAndFolderDto>> page, HttpServletRequest httpServletRequest, String name) {
+        int userid= (int) httpServletRequest.getSession().getAttribute("userid");
+        String rootFolderid=fileAndFolderService.getrootFolder(userid);
         System.out.println(name);
         List<FileAndFolderDto> list = fileAndFolderService.findByLikeName(userid,name,rootFolderid);
         Map<String, Object> data = new HashMap<>();
@@ -75,9 +77,9 @@ public class FolderAndFileController {
     }
     @RequestMapping("/findalonetypefile")
     @ResponseBody
-    public Map<String, Object> findalonetypefile(PageModel<List<FileAndFolderDto>> page, int type) {
-        int userid = 1;//从session里得
-        String rootFolderid="root";
+    public Map<String, Object> findalonetypefile(PageModel<List<FileAndFolderDto>> page,HttpServletRequest httpServletRequest, int type) {
+        int userid= (int) httpServletRequest.getSession().getAttribute("userid");
+        String rootFolderid=fileAndFolderService.getrootFolder(userid);
         List<FileAndFolderDto> list = fileAndFolderService.findByFiltype(userid,type,rootFolderid);
         Map<String, Object> data = new HashMap<>();
         data.put("code", 0);
@@ -88,9 +90,10 @@ public class FolderAndFileController {
     }
     @RequestMapping("/searchalonetypefile")
     @ResponseBody
-    public Map<String, Object> searchalonetypefile(PageModel<List<FileAndFolderDto>> page, int type,String name) {
-        int userid = 1;//从session里得
-        String rootFolderid="root";
+    public Map<String, Object> searchalonetypefile(PageModel<List<FileAndFolderDto>> page,HttpServletRequest httpServletRequest, int type,String name) {
+        int userid= (int) httpServletRequest.getSession().getAttribute("userid");
+
+        String rootFolderid=fileAndFolderService.getrootFolder(userid);
         List<FileAndFolderDto> list = fileAndFolderService.findalonefileByFiltype(userid,type,name,rootFolderid);
         Map<String, Object> data = new HashMap<>();
         data.put("code", 0);
@@ -102,8 +105,8 @@ public class FolderAndFileController {
     //添加文件夹
     @RequestMapping("/addFolder")
     @ResponseBody
-    public Map<String, Object> addFolder(@Param("filename") String filename, @Param("fatherFolderid") String fatherFolderid) {
-        int userid = 1;//session
+    public Map<String, Object> addFolder(@Param("filename") String filename, @Param("fatherFolderid") String fatherFolderid,HttpServletRequest httpServletRequest) {
+        int userid= (int) httpServletRequest.getSession().getAttribute("userid");//session
 
         Map<String, Object> rs = new HashMap<>();
         if (fileAndFolderService.isexist(filename, fatherFolderid)) {
@@ -142,8 +145,8 @@ public class FolderAndFileController {
     //重名
     @RequestMapping("/renameFolder")
     @ResponseBody
-    public Map<String, Object> updateFolder(String filename, String folderid, int type) {
-        int userid = 1;//session
+    public Map<String, Object> updateFolder(String filename, String folderid, int type,HttpServletRequest httpServletRequest) {
+        int userid= (int) httpServletRequest.getSession().getAttribute("userid");//session
         Map<String, Object> rs = new HashMap<>();
         if (type == 0) {
             if (fileAndFolderService.isexist(filename,folderid)) {
@@ -214,9 +217,9 @@ public class FolderAndFileController {
 
     @RequestMapping("/copyormoveall")
     @ResponseBody
-    public Map<String, Object> copyfileall( @Param("objects") String objects,@Param("altertype") int altertype,@Param("aimFolderid") String aimFolderid) {
+    public Map<String, Object> copyfileall( HttpServletRequest httpServletRequest,@Param("objects") String objects,@Param("altertype") int altertype,@Param("aimFolderid") String aimFolderid) {
         System.out.println(objects);
-        int userid = 1;//session
+        int userid= (int) httpServletRequest.getSession().getAttribute("userid");//session
         Map<String, Object> rs = new HashMap<>();
         List<FileAndFolderDto> list=JSONObject.parseArray(objects,FileAndFolderDto.class);
         if (!fileAndFolderService.allcanmoveorcopy(list, userid,aimFolderid)) {
@@ -256,9 +259,9 @@ public class FolderAndFileController {
     @RequestMapping("/copyormove")
     @ResponseBody
     //type=0代表是文件夹
-    public Map<String, Object> copyfile(@Param("folderid") String folderid, @Param("type") int type, @Param("altertype") Integer altertype, @Param("aimFolderid") String aimFolderid) {
-        int userid = 1;//session
-        String rootFolderid="root";
+    public Map<String, Object> copyfile(HttpServletRequest httpServletRequest,@Param("folderid") String folderid, @Param("type") int type, @Param("altertype") Integer altertype, @Param("aimFolderid") String aimFolderid) {
+        int userid= (int) httpServletRequest.getSession().getAttribute("userid");//session
+        String rootFolderid=fileAndFolderService.getrootFolder(userid);
         Map<String, Object> rs = new HashMap<>();
         if (!fileAndFolderService.canmoveorcopy(folderid, type, altertype, aimFolderid, userid)) {
             rs.put("code", 1);
@@ -290,9 +293,9 @@ public class FolderAndFileController {
 
     @RequestMapping(value = "/treeload")
     @ResponseBody
-    public Object findTypeTree() throws Exception {
-        int userid = 1;
-        String rootFolderid="root";
+    public Object findTypeTree(HttpServletRequest httpServletRequest) throws Exception {
+        int userid= (int) httpServletRequest.getSession().getAttribute("userid");
+        String rootFolderid=fileAndFolderService.getrootFolder(userid);
         List<FolderDto> folderDtos = fileAndFolderService.getFolderTree(userid);//查出所有部门
         List<LayuiTree> list = new ArrayList<>();
         LayuiTree treeObject = new LayuiTree();
@@ -343,9 +346,10 @@ public class FolderAndFileController {
     }
     @RequestMapping("/findrecyclefile")
     @ResponseBody
-    public Map<String, Object> findrecyclefile(PageModel<List<FileAndFolderDto>> page) {
-        int userid = 1;//从session里得
-        String rootFolderid="root";
+    public Map<String, Object> findrecyclefile(PageModel<List<FileAndFolderDto>> page ,HttpServletRequest httpServletRequest) {
+        int userid= (int) httpServletRequest.getSession().getAttribute("userid");
+
+        String rootFolderid=fileAndFolderService.getrootFolder(userid);
         List<FileAndFolderDto> list = fileAndFolderService.findrecyclerfile(userid,rootFolderid);
         Map<String, Object> data = new HashMap<>();
         data.put("code", 0);

@@ -76,7 +76,26 @@ public class shareController {
                 model.addAttribute("flag",1);
             }
         }
+        model.addAttribute("shareUrl",shareUrl);
         return "getfilefromurl";
+    }
+    @RequestMapping("/shareverify")
+    @ResponseBody
+    public Map<String, Object> shareverify(String password,String shareUrl) {
+        System.out.println(shareUrl);
+        System.out.println(password);
+
+        Sharefile sharefile=shareService.getfilebyShareurl(shareUrl);
+        Map<String, Object> rs = new HashMap<>();
+        boolean flag=password.equals(sharefile.getPassword());
+        if (!flag) {
+            rs.put("code", 1);
+            rs.put("msg", "密码不正确");
+        } else {
+            rs.put("code", 0);
+            rs.put("msg", "密码正确");
+        }
+        return rs;
     }
     @RequestMapping(value = "/treeload")
     @ResponseBody
@@ -130,6 +149,16 @@ public class shareController {
     {
         model.addAttribute("groupid",groupid);
         return "groupFolder";
+    }
+    @RequestMapping("/getsharedetail")
+    @ResponseBody
+    public Map<String, Object> getsharedetail( String shareUrl) {
+        List<FileAndFolderDto> list = shareService.getsharedetail(shareUrl);
+        Map<String, Object> data = new HashMap<>();
+        data.put("code", 0);
+        data.put("msg", "查询完成");
+        data.put("data", list);
+        return data;
     }
 
 

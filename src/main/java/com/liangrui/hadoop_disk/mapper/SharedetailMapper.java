@@ -3,6 +3,9 @@ package com.liangrui.hadoop_disk.mapper;
 import com.liangrui.hadoop_disk.bean.entity.Sharedetail;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
+
+import java.util.List;
+
 @Mapper
 public interface SharedetailMapper {
     @Delete({
@@ -44,4 +47,6 @@ public interface SharedetailMapper {
         "where shareDetailId = #{sharedetailid,jdbcType=INTEGER}"
     })
     int updateByPrimaryKey(Sharedetail record);
+    @Select("select * from sharedetail where shareId=#{shareid}")
+    List<Sharedetail> findAllSharedetailByShareid(int sherid);
 }

@@ -27,6 +27,8 @@ public class ShareServiceImpl implements ShareService {
     private FolderMapper folderMapper;
     @Autowired
     private GroupFileService groupFileService;
+    @Autowired
+    private FileindexMapper fileindexMapper;
 
     @Override
     @Transactional(rollbackFor = {RuntimeException.class, Error.class})
@@ -98,5 +100,38 @@ public class ShareServiceImpl implements ShareService {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    @Override
+    public List<FileAndFolderDto> getsharedetail(String shareUrl) {
+        List<FileAndFolderDto> list2 = new ArrayList<>();
+        Sharefile sharefile=sharefileMapper.fildFileByshareUrl(shareUrl);
+        List<Sharedetail> list=sharedetailMapper.findAllSharedetailByShareid(sharefile.getShareid());
+        for(Sharedetail sharedetail:list)
+        {
+            if(sharedetail.getResourcetype()==0)
+            {
+                Folder folder=folderMapper.selectByPrimaryKey(sharedetail.getResourcetypeid());
+                FileAndFolderDto fileAndFolderDto=new FileAndFolderDto();
+                fileAndFolderDto.setId(folder.getFolderid());
+                fileAndFolderDto.setName(folder.getName());
+                fileAndFolderDto.setSharetype(folder.getSharetype());
+                fileAndFolderDto.setUpdatetime(folder.getUpdatetime());
+                list2.add(fileAndFolderDto);
+            }
+            else{
+                Fileindex fileindex=fileindexMapper.selectByPrimaryKey(Integer.valueOf(sharedetail.getResourcetypeid()));
+                FileAndFolderDto fileAndFolderDto=new FileAndFolderDto();
+                fileAndFolderDto.setId(String.valueOf(fileindex.getFileid()));
+                fileAndFolderDto.setName(fileindex.getName());
+                fileAndFolderDto.setUpdatetime(fileindex.getUpdatetime());
+                fileAndFolderDto.setType(1);
+                fileAndFolderDto.setSize(fileindex.getSize());
+                fileAndFolderDto.setFiletype(fileindex.getFiletype());
+                fileAndFolderDto.setSharetype(fileindex.getSharetype());
+                list2.add(fileAndFolderDto);
+            }
+        }
+        return list2;
     }
 }

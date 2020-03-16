@@ -31,4 +31,5 @@ public interface FileAndFolderService {
     public List<FileAndFolderDto> findrecyclerfile(int userid,String rootfolderid);
     int delterecycle(int userid, String fileOrFolderid, int type);//是文件还是文件夹
     int recycle(int userid, String folderid, int type);
+    String getrootFolder(int userid);
 }

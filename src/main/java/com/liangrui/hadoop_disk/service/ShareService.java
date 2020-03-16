@@ -14,4 +14,5 @@ public interface ShareService {
     void shareinGroup(List<FileAndFolderDto> list ,int groupid, String aimFolderid);
     Sharefile getfilebyShareurl(String shareurl);
     int sharefileIsLowNewdate(String datestring,String day);
+    List<FileAndFolderDto> getsharedetail( String shareUrl);
 }

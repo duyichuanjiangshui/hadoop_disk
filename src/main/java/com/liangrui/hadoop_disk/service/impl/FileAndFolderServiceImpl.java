@@ -2,9 +2,11 @@ package com.liangrui.hadoop_disk.service.impl;
 
 import com.liangrui.hadoop_disk.bean.dto.FileAndFolderDto;
 import com.liangrui.hadoop_disk.bean.dto.FolderDto;
+import com.liangrui.hadoop_disk.bean.entity.Diskuser;
 import com.liangrui.hadoop_disk.bean.entity.Fileindex;
 import com.liangrui.hadoop_disk.bean.entity.Folder;
 import com.liangrui.hadoop_disk.bean.entity.Upload;
+import com.liangrui.hadoop_disk.mapper.DiskuserMapper;
 import com.liangrui.hadoop_disk.mapper.FileindexMapper;
 import com.liangrui.hadoop_disk.mapper.FolderMapper;
 import com.liangrui.hadoop_disk.mapper.UploadMapper;
@@ -27,6 +29,8 @@ public class FileAndFolderServiceImpl implements FileAndFolderService {
     private FileindexMapper fileindexMapper;
     @Autowired
     private UploadMapper uploadMapper;
+    @Autowired
+    private DiskuserMapper diskuserMapper;
     @Override
     public List<FileAndFolderDto> findAllFileAndFolder(String fatherFolderid) {
         List<Folder> list=folderMapper.selectByFatherFolder(fatherFolderid);
@@ -537,5 +541,11 @@ public class FileAndFolderServiceImpl implements FileAndFolderService {
             fileindex.setIsdelete(0);
             return fileindexMapper.updateByPrimaryKey(fileindex);
         }
+    }
+
+    @Override
+    public String getrootFolder(int userid) {
+        Diskuser diskuser=diskuserMapper.selectByPrimaryKey(userid);
+        return diskuser.getRootfolderid();
     }
 }

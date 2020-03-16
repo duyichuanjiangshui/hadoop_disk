@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all">
     <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
     <script src="../static/layui-v2.2.5/layui.js"></script>
-</head>
-<style>
+    <style>
 
     .main{
 
@@ -29,6 +28,8 @@
     }
 
 </style>
+</head>
+
 <body>
 <div class="layui-layout layui-layout-admin">
 <div class="layui-header">
@@ -59,31 +60,31 @@
 
         </div>
         <!--这是验证提取码的div-->
-        <div class="main" id="verify" style="display: none">
+        <div class="main layui-form" id="verify"  style="padding:15px 30px 15px 0;">
 
                 <div class="layui-form-item">
                     <label class="layui-form-label">提取码：</label>
                     <div class="layui-input-block">
-                        <input type="text"  name="password"  required lay-verify="required" autocomplete="off"
+                        <input type="text"  id="password"  required lay-verify="required" autocomplete="off"
                         class="layui-input">
                     </div>
                 </div>
-                    <div class="layui-input-block">
-                        <button class="layui-btn" lay-submit lay-filter="add">立即提交</button>
-                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-                    </div>
-        </div>
-        <div class="layui-inline" style="display: none">
-            <div class="layui-btn-group">
-                <button class="layui-btn" type="button" id="copyall">保存到云盘</button>
+               <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="add">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
             </div>
         </div>
+        <div  style="display: none" id="detailtable">
         <div class="layui-container layui-side-scroll" style="margin: 0; width: 100%; padding: 5px 15px;">
+            <button class="layui-btn" type="button" id="copyall">保存到云盘</button>
             <div class="layui-row">
                 <div class="layui-col-lg12">
                     <table id="demo" lay-filter="test"></table>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 <div>
@@ -91,26 +92,151 @@
 <script type="text/html" id="barDemo">
         <a class="layui-btn layui-btn-xs" lay-event="save">保存</a>
 </script>
+
+
 <script>
-    layui.config({
-        base: "../static/layui-v2.2.5/lay/mymodules/"
-    }).use(['element', 'layer', 'table', 'dropdown'],
+    var json;
+    layui.use(['element', 'layer', 'table','form'],
         function () {
             let element = layui.element;
             let table = layui.table;
             let layer = layui.layer;
             let $ = layui.jquery;//表格插件;
             var flag=[[${flag}]];
+            var form=layui.form;
             console.log(flag);
-
             if(flag==0)
             {
+                $("#verify").hide();
                 var temp="<p style='color: #1E9FFF;size: B4'>[[${msg}]]</p>";
                 $("#remaind").append(temp);
-            }else {
-                $("#verify").show();
             }
 
+            form.on('submit(add)', function (data) {
+                layer.msg(JSON.stringify(data.field));
+                var password=$("#password").val();
+                console.log(password)
+
+                console.log(flag);
+                $.ajax({
+                    type: "POST",
+                    url:'http://localhost:8000/hadoop/share/shareverify?shareUrl=[[${shareUrl}]]&password='+password,
+                    contentType: "application/json;charset=utf-8",
+                    success: function (message) {
+                        if (message.code === 0) {
+                            $("#verify").hide();
+                            $("#detailtable").show();
+
+                            var tableIns = table.render({
+                                elem: '#demo'
+                                , id: 'fileAndFolder'
+                                , cellMinWidth: 80
+                                , url: '/hadoop/share/getsharedetail?shareUrl=[[${shareUrl}]]'
+                                , cols: [
+                                    [
+                                        {title: '选择', width: 36, type: 'checkbox', fixed: 'left'},
+                                        {
+                                            field: 'type', align: 'center', width: 50, templet: function (row) {
+                                                if (row.type === 0) {
+                                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe737;</i>";
+                                                } else {
+                                                    if (row.filetype === "rar" || row.filetype === "zip")
+                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe634;</i>";
+                                                    else if (row.filetype === "mp4" || row.filetype === "mov")
+                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe66f;</i>";
+                                                    else if (row.filetype === "pdf")
+                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8e8;</i>";
+                                                    else if (row.filetype === "mps" || row.filetype === "wma")
+                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe602;</i>";
+                                                    else if (row.filetype === "txt")
+                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe63b;</i>";
+                                                    else if (row.filetype === "docx")
+                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8ac;</i>";
+                                                    else if (row.filetype === "exe")
+                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8ac;</i>";
+                                                    else if (row.filetype === "apk")
+                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe68d;</i>";
+                                                    else
+                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe65b;</i>";
+
+
+                                                }
+                                            }
+                                        }
+                                        , {
+                                        field: 'name', title: '文件名', sort: true, templet: function (row) {
+                                            if (row.type === 0) {
+                                                return "<a onclick='top.addtap(\"/hadoop/fileAndFolder/allFile?fatherFolderid=" + row.id + "\",\"" + row.id.toString() + "\",\"" + row.name + "\")'>" + row.name + "</a>";
+                                            } else {
+                                                return "<a onclick='preview(" + row.id + ",\"" + row.filetype + "\"," + row.size + ",\"" + row.name + "\")'>" + row.name + "</a>";
+                                            }
+
+                                        }
+                                    }
+                                        , {
+                                        field: 'size', title: '大小', sort: true, templet: function (row) {
+                                            if (row.size === 0) {
+                                                return "- -";
+                                            } else {
+                                                return (row.size) + " kb";
+                                            }
+                                        }
+                                    }
+                                        , {field: 'updatetime', title: '修改日期', sort: true}
+                                        ,
+                                         {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150, align: "center"}
+                                    ]
+                                ]
+                            });
+
+                        }
+                    },
+                    error: function (message) {
+                        console.log(JSON.stringify(message));
+                        layer.msg("提取失败", {
+                            icon: 2,
+                            time: 1500
+                        });
+                    }
+                });
+            });
+            $("#copyall").click(function () {
+                var checkStatus = table.checkStatus('fileAndFolder');
+                var data = checkStatus.data;
+                if (data.length > 0) {
+                    json = JSON.stringify(data);
+                    layer.open({
+                        type: 2,
+                        title: '请选择文件夹',
+                        shadeClose: true,
+                        shade: 0.8,
+                        offset: '30px',
+                        area: ['80%', '60%'],
+                        content: "/hadoop/fileAndFolder/onlyfolderlist?altertype=0"//iframe的url
+                    });
+                } else {
+                    layer.msg("请先选中！！", {
+                        icon: 2,
+                        time: 1500
+                    });
+                }
+            });
+            table.on('tool(test)', function (obj) {
+                let data = obj.data;
+                if(obj.event=='save')
+                {
+                    layer.open({
+                        type: 2,
+                        title: '请选择文件夹',
+                        shadeClose: true,
+                        shade: 0.8,
+                        offset: '30px',
+                        area: ['80%', '60%'],
+                        content: "/hadoop/fileAndFolder/onlyfolder?folderid=" + data.id + "&type=" + data.type + "&altertype=0"//iframe的url
+                    });
+
+                }
+            });
         });
 </script>
 </body>
