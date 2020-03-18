@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>全部文件</title>
+    <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
+    <script src="../static/layui-v2.2.5/layui.js"></script>
+    <link rel="stylesheet" href="../static/layui-v2.2.5/extend/dropdown.css" media="all">
+    <script src="../static/js/clipboard.min.js"></script>
+</head>
+<body>
+
+<div>
+    <div class="layui-inline">
+        <div class="layui-btn-group">
+            <button class="layui-btn" type="button" id="deleteall">删除</button>
+        </div>
+    </div>
+</div>
+</div>
+<div class="layui-container layui-side-scroll" style="margin: 0; width: 100%; padding: 5px 15px;">
+    <div class="layui-row">
+        <div class="layui-col-lg12">
+            <table id="demo" lay-filter="test"></table>
+        </div>
+    </div>
+</div>
+<!--用隐藏表单实现下载-->
+<script type="text/html" id="barDemo">
+    <div class="urp-dropdown urp-dropdown-table">
+        <a class="layui-btn layui-btn-xs btn" lay-event="copy">复制链接</a>
+        <a class="layui-btn layui-btn-xs" lay-event="del">删除</a>
+    </div>
+</script>
+<script th:inline="javascript">
+    //将以下代码粘入相关页面中
+
+    layui.config({
+        base: "../static/layui-v2.2.5/lay/mymodules/"
+    }).use(['element', 'layer', 'table', 'dropdown'], function () {
+        let element = layui.element;
+        let table = layui.table;
+        let layer = layui.layer;
+        let dropdown = layui.dropdown;
+        let $ = layui.jquery;//表格插件;
+        var tableIns = table.render({
+            elem: '#demo'
+            , id: 'fileAndFolder'
+            , cellMinWidth: 80
+            , url: '/hadoop/share/myshare'
+            , cols: [
+                [
+                    {title: '选择', width: 36, type: 'checkbox', fixed: 'left'},
+                    {
+                    field: 'shareurl', title: '分享链接'}
+                    , {field: 'password', title: '密码'}
+                    , {field: 'viewshareNumber', title: '点击人数'}
+                    , {field: 'starttime', title: '创建日期', sort: true}
+                    ,{field:'sharetime',title: '失效', sort: true}
+                    , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150, align: "center"}
+                ]
+            ]
+        });
+        //监听行工具事件
+        table.on('tool(test)', function (obj) {
+            var $=layui.jquery;
+            let data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'del') {
+                layer.confirm('确认删除？', function (index) {
+
+                    $.ajax({
+                        url: "/hadoop/share/delete?id=" + data.id ,
+                        success: function (message) {
+                            layer.close(index);
+                            layui.table.reload('fileAndFolder');
+                        },
+                        error: function (message) {
+                            console.log(JSON.stringify(message));
+                            layer.msg("删除失败", {
+                                icon: 2,
+                                time: 1500
+                            });
+                        }
+                    });
+                });
+            }else if(obj.event=='copy')
+            {
+                var temp=data.shareurl+'\n提取码:'+data.password;
+
+
+                var clipboard = new ClipboardJS('.btn', {
+                    text: function() {
+                        return temp;
+                    }
+                });
+                alert("复制成功！");
+            }
+        });
+        $("#deleteall").click(function () {
+            var checkStatus = table.checkStatus('fileAndFolder');
+            var data = checkStatus.data;
+            if (data.length > 0) {
+                layer.confirm('确认删除？', function (index) {
+                    $.ajax({
+                        url: "/hadoop/share/deleteall",
+                        contentType: "application/json;charset=utf-8",
+                        data: {"objects": JSON.stringify(data)},
+                        success: function (message) {
+                            layer.close(index);
+                            layui.table.reload('fileAndFolder');
+
+                        },
+                        error: function (message) {
+                            console.log(JSON.stringify(message));
+                            layer.msg("删除失败", {
+                                icon: 2,
+                                time: 1500
+                            });
+                        }
+                    });
+                });
+            } else {
+                layer.msg("请先选中！！", {
+                    icon: 2,
+                    time: 1500
+                });
+            }
+        });
+
+
+    });
+</script>
+</body>
+</html>

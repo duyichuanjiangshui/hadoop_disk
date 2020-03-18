@@ -58,6 +58,7 @@
 </script>
 <script th:inline="javascript">
     var json;
+
     //将以下代码粘入相关页面中
     function preview(fileindexid, filetype, size, filename) {
         var allow = "doc,docx,ppt,pptx,xls,xlsx,mp4,mp3,txt,java,php,py,md,js,css,jpg,jpeg,png,gif";
@@ -85,6 +86,7 @@
     }
 
     function changeFileStatus(sharetype, fileid, type) {
+        var $=layui.jquery;
         $.ajax({
             url: "/hadoop/fileAndFolder/changefileStaus?sharetype=" + sharetype + "&folderid=" + fileid + "&type=" + type,
             method: "post",

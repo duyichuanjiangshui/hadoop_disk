@@ -5,6 +5,8 @@ import com.liangrui.hadoop_disk.bean.entity.Sharefile;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 
+import java.util.List;
+
 @Mapper
 public interface SharefileMapper {
     @Delete({
@@ -58,4 +60,7 @@ public interface SharefileMapper {
 
     @Select("select * from sharefile where shareurl = #{shareurl}")
     Sharefile fildFileByshareUrl(String shareurl);
+    @Select("select * from sharefile where userId = #{userid}")
+    List<Sharefile> fildFileByUserid(int userid);
+
 }

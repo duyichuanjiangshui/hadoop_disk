@@ -49,4 +49,9 @@ public interface SharedetailMapper {
     int updateByPrimaryKey(Sharedetail record);
     @Select("select * from sharedetail where shareId=#{shareid}")
     List<Sharedetail> findAllSharedetailByShareid(int sherid);
+    @Delete({
+            "delete from sharedetail",
+            "where shareId = #{shareId}"
+    })
+    int deleteBy(Integer shareId);
 }

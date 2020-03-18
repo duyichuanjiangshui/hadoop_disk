@@ -7,6 +7,7 @@ import com.liangrui.hadoop_disk.bean.dto.FolderDto;
 import com.liangrui.hadoop_disk.bean.dto.LayuiTree;
 import com.liangrui.hadoop_disk.bean.entity.Resgroup;
 import com.liangrui.hadoop_disk.bean.entity.Sharefile;
+import com.liangrui.hadoop_disk.bean.model.MyShareModel;
 import com.liangrui.hadoop_disk.service.FileAndFolderService;
 import com.liangrui.hadoop_disk.service.GroupFileService;
 import com.liangrui.hadoop_disk.service.ShareService;
@@ -161,6 +162,40 @@ public class shareController {
         return data;
     }
 
-
+    @RequestMapping("/myshare")
+    @ResponseBody
+    public Map<String, Object> getmyshare( HttpServletRequest httpServletRequest) {
+        int userid= (int) httpServletRequest.getSession().getAttribute("userid");
+        List<MyShareModel> list = shareService.getMyShare(userid);
+        Map<String, Object> data = new HashMap<>();
+        data.put("code", 0);
+        data.put("msg", "查询完成");
+        data.put("data", list);
+        return data;
+    }
+    @RequestMapping("/mysharepage")
+    public String mysharepage()
+    {
+        return "myshare";
+    }
+    @RequestMapping("delete")
+    @ResponseBody
+    public Map<String, Object> delete( int id) {
+        Map<String, Object> data = new HashMap<>();
+        shareService.delete(id);
+        data.put("code", 0);
+        data.put("msg", "删除成功");
+        return data;
+    }
+    @RequestMapping("deleteall")
+    @ResponseBody
+    public Map<String, Object> deleteall(String objects) {
+        Map<String, Object> data = new HashMap<>();
+        List<MyShareModel> list=JSONObject.parseArray(objects,MyShareModel.class);
+        shareService.deleteall(list);
+        data.put("code", 0);
+        data.put("msg", "删除成功");
+        return data;
+    }
 
 }

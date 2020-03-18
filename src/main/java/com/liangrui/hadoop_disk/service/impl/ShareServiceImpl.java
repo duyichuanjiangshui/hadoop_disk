@@ -3,6 +3,7 @@ package com.liangrui.hadoop_disk.service.impl;
 import com.liangrui.hadoop_disk.bean.dto.FileAndFolderDto;
 import com.liangrui.hadoop_disk.bean.dto.FolderDto;
 import com.liangrui.hadoop_disk.bean.entity.*;
+import com.liangrui.hadoop_disk.bean.model.MyShareModel;
 import com.liangrui.hadoop_disk.mapper.*;
 import com.liangrui.hadoop_disk.service.GroupFileService;
 import com.liangrui.hadoop_disk.service.ShareService;
@@ -106,6 +107,12 @@ public class ShareServiceImpl implements ShareService {
     public List<FileAndFolderDto> getsharedetail(String shareUrl) {
         List<FileAndFolderDto> list2 = new ArrayList<>();
         Sharefile sharefile=sharefileMapper.fildFileByshareUrl(shareUrl);
+        if (sharefile.getStatue() == null) {
+            sharefile.setStatue(0);
+        } else {
+            sharefile.setStatue(sharefile.getStatue() + 1);
+        }
+        sharefileMapper.updateByPrimaryKey(sharefile);//更新浏览其实
         List<Sharedetail> list=sharedetailMapper.findAllSharedetailByShareid(sharefile.getShareid());
         for(Sharedetail sharedetail:list)
         {
@@ -133,5 +140,62 @@ public class ShareServiceImpl implements ShareService {
             }
         }
         return list2;
+    }
+
+    @Override
+    public List<MyShareModel> getMyShare(int userid) {
+        List<Sharefile> list=sharefileMapper.fildFileByUserid(userid);
+        List<MyShareModel> list1=new ArrayList<>();
+        for(Sharefile sharefile:list)
+        {
+            MyShareModel myShareModel=new MyShareModel();
+            myShareModel.setPassword(sharefile.getPassword());
+            if (sharefile.getSharetime() != null) {
+                if(sharefileIsLowNewdate(sharefile.getStarttime(), sharefile.getSharetime())!=1)
+                myShareModel.setSharetime("已失效");
+                    else
+                {
+                    try {
+                        Date date1=DateUtil.StringToDate("yyyy-MM-dd HH:mm:ss",sharefile.getStarttime());
+                        date1=DateUtil.addDate(date1, Long.parseLong(sharefile.getSharetime()));
+                        myShareModel.setSharetime(DateUtil.DateToString("yyyy-MM-dd HH:mm:ss",date1));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                myShareModel.setSharetime("永久有效");
+            }
+            myShareModel.setShareurl("http://localhost:8000/hadoop/share/s?shareUrl="+sharefile.getShareurl());
+            if (sharefile.getStatue() == null) {
+                myShareModel.setViewshareNumber(0);
+            } else {
+                myShareModel.setViewshareNumber(sharefile.getStatue());
+            }
+            myShareModel.setStarttime(sharefile.getStarttime());
+            myShareModel.setId(sharefile.getShareid());
+            list1.add(myShareModel);
+        }
+        return list1;
+    }
+
+    @Override
+    @Transactional(rollbackFor = {RuntimeException.class, Error.class})
+    public int delete(int id) {
+        sharedetailMapper.deleteBy(id);
+        sharefileMapper.deleteByPrimaryKey(id);
+
+        return 0;
+    }
+
+    @Override
+    @Transactional(rollbackFor = {RuntimeException.class, Error.class})
+    public void deleteall(List<MyShareModel> list) {
+        for(MyShareModel myShareModel:list)
+        {
+            sharedetailMapper.deleteBy(myShareModel.getId());
+            sharefileMapper.deleteByPrimaryKey(myShareModel.getId());
+        }
+
     }
 }
