@@ -39,7 +39,6 @@ public class LayimServiceImpl implements LayimService {
         LayimUserModel mine=new LayimUserModel();
         mine.setAvatar(diskuser.getImgpath());
         mine.setId(diskuser.getUserid());
-        if(diskuser.getStatue()==1)//登录状态
         mine.setStatus("online");
         mine.setUsername(diskuser.getName());
         mine.setSign(diskuser.getSign());
@@ -234,5 +233,34 @@ public class LayimServiceImpl implements LayimService {
             layimMsgboxModels.add(layimMsgboxModel);
         }
         return layimMsgboxModels;
+    }
+/*
+*
+* {
+  "code": 0 //0表示成功，其它表示失败
+  ,"msg": "" //失败信息
+  ,"data": {
+    "list": [{
+      "username": "马小云" //群员昵称
+      ,"id": "168168" //群员id
+      ,"avatar": "http://tp4.sinaimg.cn/2145291155/180/5601307179/1" //群员头像
+      ,"sign": "让天下没有难写的代码" //群员签名
+    }, …… ]
+  }
+}  */
+    @Override
+    public List<LayimUserModel> getnumberbygroupid(int groupid) {
+        List<LayimUserModel> list=new ArrayList<>();
+        List<Diskuser> diskusers=diskuserMapper.selectuserformgroupid(groupid);
+        for(Diskuser diskuser:diskusers)
+        {
+            LayimUserModel layimUserModel=new LayimUserModel();
+            layimUserModel.setAvatar(diskuser.getImgpath());
+            layimUserModel.setSign(diskuser.getSign());
+            layimUserModel.setId(diskuser.getUserid());
+            layimUserModel.setUsername(diskuser.getName());
+            list.add(layimUserModel);
+        }
+        return list;
     }
 }

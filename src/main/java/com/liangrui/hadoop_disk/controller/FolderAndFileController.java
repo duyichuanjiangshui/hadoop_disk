@@ -5,8 +5,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.liangrui.hadoop_disk.bean.dto.FileAndFolderDto;
 import com.liangrui.hadoop_disk.bean.dto.FolderDto;
 import com.liangrui.hadoop_disk.bean.dto.LayuiTree;
+import com.liangrui.hadoop_disk.bean.entity.Diskuser;
 import com.liangrui.hadoop_disk.bean.model.PageModel;
 import com.liangrui.hadoop_disk.service.FileAndFolderService;
+import com.liangrui.hadoop_disk.service.UserService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,10 +17,7 @@ import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/fileAndFolder")
@@ -29,6 +28,8 @@ public class FolderAndFileController {
     //全部文件索引
     @Autowired
     private FileAndFolderService fileAndFolderService;
+    @Autowired
+    private UserService userService;
 
     @RequestMapping("/allFile")
     public String allFile(Model model, String fatherFolderid) {
@@ -51,6 +52,7 @@ public class FolderAndFileController {
         model.addAttribute("fatherid", fatherFolder);
         return data;
     }
+
     @RequestMapping("/searchpage")
     public String searchpage(Model model, String name) {
         model.addAttribute("name",name);
@@ -462,4 +464,76 @@ public class FolderAndFileController {
         return rs;
     }
 
+    //search public
+    @RequestMapping("/searchpublicbylikename")
+    @ResponseBody
+    public Map<String, Object> searchPublicbylikename(PageModel<List<FileAndFolderDto>> page, String text,String objects) {
+        System.out.println(text);
+        List<Integer> integers=JSONObject.parseArray(objects,Integer.class);
+        List<FileAndFolderDto> list = fileAndFolderService.searchpublic(text,integers);
+        list.sort(new Comparator<FileAndFolderDto>() {
+            @Override
+            public int compare(FileAndFolderDto o1, FileAndFolderDto o2) {
+
+                String s1=o1.getUpdatetime();
+                String s2=o2.getUpdatetime();
+                return s1.compareTo(s2);
+            }
+        });
+        int pageint = page.getPage() - 1;
+        int toindex=page.getLimit()+pageint*page.getLimit();
+        int fromindex=pageint*page.getLimit();
+        if (toindex >= list.size()) {
+            toindex = list.size() ;
+        }List<FileAndFolderDto> list2=new ArrayList<>();
+        System.out.println(fromindex+" "+toindex);
+        if(list.size()>0)
+        list2=list.subList(fromindex,toindex);
+        Map<String, Object> data = new HashMap<>();
+        data.put("code", 0);
+        data.put("msg", "查询完成");
+        data.put("count", list2.size());
+        data.put("data", list2);
+        return data;
+    }
+    @RequestMapping("/allPublicFolder")
+    @ResponseBody
+    public Map<String, Object> allPublicFolder(PageModel<List<FileAndFolderDto>> page, Model model, String fatherFolder) {
+        List<FileAndFolderDto> list = fileAndFolderService.findPublicAllFileAndFolder(fatherFolder);
+        Map<String, Object> data = new HashMap<>();
+        list.sort(new Comparator<FileAndFolderDto>() {
+            @Override
+            public int compare(FileAndFolderDto o1, FileAndFolderDto o2) {
+
+                String s1=o1.getUpdatetime();
+                String s2=o2.getUpdatetime();
+                return s1.compareTo(s2);
+            }
+        });
+        int pageint = page.getPage() - 1;
+        int toindex=page.getLimit()+pageint*page.getLimit();
+        int fromindex=pageint*page.getLimit();
+        if (toindex >= list.size()) {
+            toindex = list.size() ;
+        }List<FileAndFolderDto> list2=new ArrayList<>();
+        System.out.println(fromindex+" "+toindex);
+        if(list.size()>0)
+            list2=list.subList(fromindex,toindex);
+        data.put("code", 0);
+        data.put("msg", "查询完成");
+        data.put("count", list2.size());
+        data.put("data", list2);
+        model.addAttribute("fatherid", fatherFolder);
+        return data;
+    }
+    @RequestMapping("/searchpublicpage")
+    public String getssearchpublicpage(Model model,HttpServletRequest httpServletRequest)
+    {
+
+        int userid=  (int) httpServletRequest.getSession().getAttribute("userid");
+        Diskuser diskuser1=userService.finddiskuserbyuserid(userid);
+        model.addAttribute("name",diskuser1.getName());
+        model.addAttribute("imgsrc",diskuser1.getImgpath());
+        return "searchpublic";
+    }
 }

@@ -2,9 +2,11 @@ package com.liangrui.hadoop_disk.controller;
 
 import com.liangrui.hadoop_disk.bean.dto.FriendUserDto;
 import com.liangrui.hadoop_disk.bean.dto.GroupDto;
+import com.liangrui.hadoop_disk.bean.entity.Diskuser;
 import com.liangrui.hadoop_disk.bean.entity.Friend;
 import com.liangrui.hadoop_disk.bean.entity.Resgroup;
 import com.liangrui.hadoop_disk.service.FriendAndGroupService;
+import com.liangrui.hadoop_disk.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,9 +23,17 @@ import java.util.List;
 public class indexController {
     @Autowired
     FriendAndGroupService friendAndGroupService;
+    @Autowired
+    private UserService userService;
     @RequestMapping("/mainindex")
-    public String mainIndex()
+    public String mainIndex(Model model,HttpServletRequest httpServletRequest)
     {
+      int userid=  (int) httpServletRequest.getSession().getAttribute("userid");
+        Diskuser diskuser1=userService.finddiskuserbyuserid(userid);
+        model.addAttribute("userid",userid);
+        model.addAttribute("fatherFolderid",diskuser1.getRootfolderid());
+        model.addAttribute("name",diskuser1.getName());
+        model.addAttribute("imgsrc",diskuser1.getImgpath());
         return "iframe";
     }
     @GetMapping("/login")
@@ -69,6 +79,36 @@ public class indexController {
     {
         return "msgbox";
     }
+    @RequestMapping("/register")
+    public String registerpage()
+    {
+        return "register";
+    }
+    @RequestMapping("/forgetpassword")
+    public String forgetpassword()
+    {
+        return "getbackpassword";
+    }
+
+    @RequestMapping("mydetail")
+    public String mydetail(Model model,HttpServletRequest httpServletRequest)
+    {
+        int userid=  (int) httpServletRequest.getSession().getAttribute("userid");
+        Diskuser diskuser1=userService.finddiskuserbyuserid(userid);
+        model.addAttribute("user",diskuser1);
+        return "mydetail";
+    }
+    @RequestMapping("newpwd")
+    public String newpwd()
+    {
+        return  "newpassword";
+    }
+    @RequestMapping("/error")
+    public String error()
+    {
+        return "error";
+    }
+
 
 
 

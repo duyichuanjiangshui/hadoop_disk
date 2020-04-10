@@ -5,7 +5,7 @@
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>主要索引</title>
+    <title>提取文件</title>
     <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all">
     <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
     <script src="../static/layui-v2.2.5/layui.js"></script>
@@ -26,33 +26,48 @@
         padding: 1em;
 
     }
+     .demo{
+         font-size: 14px;
+         color: #999 !important;
+         margin-top: 5px;
+         margin-left: 5px;
+         margin-right:5px;
+         margin-bottom: 5px;
+     }
+    .demo:hover{
+        color: #5FB878 !important
+    }
+    .demo cite{
+        color: #666;
+        font-style: normal
+    }
 
 </style>
 </head>
 
 <body>
 <div class="layui-layout layui-layout-admin">
-<div class="layui-header">
-    <div class="layui-logo">layui 后台布局</div>
-    <!-- 头部区域（可配合layui已有的水平导航） -->
-    <ul class="layui-nav layui-layout-left">
-        <li class="layui-nav-item"><a href="">网盘</a></li>
-        <li class="layui-nav-item"><a href="">找资源</a></li>
-    </ul>
-    <ul class="layui-nav layui-layout-right">
-        <li class="layui-nav-item">
-            <a href="javascript:;">
-                <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
-                贤心
-            </a>
-            <dl class="layui-nav-child">
-                <dd><a href="">基本资料</a></dd>
-                <dd><a href="">安全设置</a></dd>
-            </dl>
-        </li>
-        <li class="layui-nav-item"><a href="">退了</a></li>
-    </ul>
-</div>
+    <div class="layui-header">
+        <div class="layui-logo">layui 后台布局</div>
+        <!-- 头部区域（可配合layui已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left">
+            <li class="layui-nav-item"><a href="/hadoop/index/mainindex">网盘</a></li>
+            <li class="layui-nav-item"><a href="/hadoop/fileAndFolder/searchpublicpage">找资源</a></li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="javascript:;">
+                    <img th:src="${imgsrc}" class="layui-nav-img">
+                    [[${name}]]
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a data-url="/hadoop/index/mydetail" data-id="mydetail" data-title="修改基本资料" class="site-demo-active" href="javascript:;" data-type="tabAdd">基本资料</a></dd>
+                    <dd><a data-url="/hadoop/index/newpwd" data-id="newpassword" data-title="修改密码" class="site-demo-active" href="javascript:;" data-type="tabAdd">修改密码</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item"><a href="/hadoop/user/loginout">退了</a></li>
+        </ul>
+    </div>
 </div>
     <div  style="top: 50px ;height: 600px ;background-color: #eaeaea" >
         <!--这是提示信息的div-->
@@ -77,6 +92,7 @@
             </div>
         </div>
         <div  style="display: none" id="detailtable">
+            <div id="guidediv"></div>
         <div class="layui-container layui-side-scroll" style="margin: 0; width: 100%; padding: 5px 15px;">
             <button class="layui-btn" type="button" id="copyall">保存到云盘</button>
             <div class="layui-row">
@@ -92,9 +108,95 @@
 <script type="text/html" id="barDemo">
         <a class="layui-btn layui-btn-xs" lay-event="save">保存</a>
 </script>
-
-
 <script>
+    var password;
+    var fatherFolderid;
+    var guide=[];
+    var guideid=[];
+    //将以下代码粘入相关页面中
+    function preview(fileindexid, filetype, size, filename) {
+        var allow = "doc,docx,ppt,pptx,xls,xlsx,mp4,mp3,txt,java,php,py,md,js,css,jpg,jpeg,png,gif";
+        var allows = allow.split(",");
+        console.log(filetype);
+        if (size > 20000000) {
+            layer.alert("文件太大不支持预览");
+        } else {
+            var flag = 0;//标记没有允许的类型
+            for (var i = 0; i < allows.length; i++) {
+                if (allows[i] == filetype) {
+                    flag = 1;
+                    break;
+                }
+            }
+            if (flag === 1) {
+                var originUrl = 'http://127.0.0.1:8000/hadoop/uploadAndDown/down?fileindexid=' + fileindexid + '&fullfilename=' + filename;
+
+                window.open('http://127.0.0.1:8012/onlinePreview?url=' + encodeURIComponent(originUrl));
+            } else {
+                layer.alert("该文件类型不允许预览");
+            }
+        }
+
+    }
+    function reloadtab(folderid,foldername)
+    {
+        fatherFolderid=folderid;
+        var table=layui.table;
+        table.reload('fileAndFolder',{
+            url:"/hadoop/groupfile/allFolder?fatherFolder="+ fatherFolderid
+        });
+        guide.push(foldername);
+        guideid.push(folderid);
+        initguide();
+    }
+
+
+    function initguide()
+    {
+        var $=layui.jquery;
+        $("#guidediv").empty();
+        for(var i=0;i<guide.length;i++)
+        {
+            console.log(guideid[i]);
+            var temp='<a onclick="changeguide(\''+guideid[i]+'\',\''+guide[i]+'\')" class="demo layui-inline">'+guide[i]+'</a>';
+            $("#guidediv").append(temp);
+        }
+    }
+    function changeguide(folder,foldername)
+    {
+
+        var temp=0;
+        var i;
+        for( i=0;i<guide.length;i++)
+        {
+            if(foldername==guide[i])
+            {
+                temp=i;
+                break;
+            }
+        }
+        for( i=1;i<=guide.length-temp;i++)
+        {
+            guide.pop();
+            guideid.pop();
+        }
+        initguide();
+        var table=layui.table;
+        if(folder==0)
+        {
+            table.reload('fileAndFolder',{
+                url:"/hadoop/share/getsharedetail?shareUrl=[[${shareUrl}]]"
+            });
+        }else
+        {
+            table.reload('fileAndFolder',{
+                url:"/hadoop/groupfile/allFolder?fatherFolder="+ guideid[temp]
+            });
+        }
+
+
+
+    }
     var json;
     layui.use(['element', 'layer', 'table','form'],
         function () {
@@ -114,8 +216,8 @@
 
             form.on('submit(add)', function (data) {
                 layer.msg(JSON.stringify(data.field));
-                var password=$("#password").val();
-                console.log(password)
+                password=$("#password").val();
+                console.log(password);
 
                 console.log(flag);
                 $.ajax({
@@ -126,7 +228,13 @@
                         if (message.code === 0) {
                             $("#verify").hide();
                             $("#detailtable").show();
-
+                            guideid.push(0);
+                            guide.push("全部文件");
+                            initguide();
+                            layer.msg("提取成功", {
+                                icon: 2,
+                                time: 1500
+                            });
                             var tableIns = table.render({
                                 elem: '#demo'
                                 , id: 'fileAndFolder'
@@ -138,26 +246,28 @@
                                         {
                                             field: 'type', align: 'center', width: 50, templet: function (row) {
                                                 if (row.type === 0) {
-                                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe737;</i>";
+                                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe737;</i>";
                                                 } else {
                                                     if (row.filetype === "rar" || row.filetype === "zip")
-                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe634;</i>";
+                                                        return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe634;</i>";
                                                     else if (row.filetype === "mp4" || row.filetype === "mov")
-                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe66f;</i>";
+                                                        return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe66f;</i>";
                                                     else if (row.filetype === "pdf")
-                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8e8;</i>";
+                                                        return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8e8;</i>";
                                                     else if (row.filetype === "mps" || row.filetype === "wma")
-                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe602;</i>";
+                                                        return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe602;</i>";
                                                     else if (row.filetype === "txt")
-                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe63b;</i>";
+                                                        return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe63b;</i>";
                                                     else if (row.filetype === "docx")
-                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8ac;</i>";
+                                                        return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8ac;</i>";
                                                     else if (row.filetype === "exe")
-                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8ac;</i>";
+                                                        return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8a7;</i>";
                                                     else if (row.filetype === "apk")
-                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe68d;</i>";
+                                                        return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe68d;</i>";
+                                                    else if (row.filetype === "jpg" || row.filetype === "jpeg" || row.filetype === "png" || row.filetype === "gif")
+                                                        return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe656;</i>";
                                                     else
-                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe65b;</i>";
+                                                        return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe655;</i>";
 
 
                                                 }
@@ -166,7 +276,7 @@
                                         , {
                                         field: 'name', title: '文件名', sort: true, templet: function (row) {
                                             if (row.type === 0) {
-                                                return "<a onclick='top.addtap(\"/hadoop/fileAndFolder/allFile?fatherFolderid=" + row.id + "\",\"" + row.id.toString() + "\",\"" + row.name + "\")'>" + row.name + "</a>";
+                                                return "<a onclick='reloadtab(\""+row.id+"\",\""+row.name+"\")'>" + row.name + "</a>";
                                             } else {
                                                 return "<a onclick='preview(" + row.id + ",\"" + row.filetype + "\"," + row.size + ",\"" + row.name + "\")'>" + row.name + "</a>";
                                             }

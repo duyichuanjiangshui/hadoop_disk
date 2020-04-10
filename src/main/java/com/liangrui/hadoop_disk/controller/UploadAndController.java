@@ -83,13 +83,12 @@ public class UploadAndController {
         try{
             if(file!=null){
                 String originalName = file.getOriginalFilename();
+                originalName = originalName.substring(originalName.lastIndexOf('\\')+1);
                 prefix=originalName.substring(originalName.lastIndexOf(".")+1);
                 Date date = new Date();
                 RowkeyUtil rowkeyUtil=new RowkeyUtil();
                 String uuid = rowkeyUtil.getRowkey();
-                String filepath = "C:\\Users\\12493\\Desktop\\java\\hadoop_disk\\src\\main\\resources\\static\\images\\"+uuid+"." + prefix;
-
-
+                String filepath = "D://yunpansysimg/"+uuid+"." + prefix;
                 File files=new File(filepath);
                 //打印查看上传路径
                 System.out.println(filepath);
@@ -102,7 +101,7 @@ public class UploadAndController {
                 map.put("code",0);
                 map.put("msg","");
                 map.put("data",map2);
-                map2.put("src","/hadoop/static/images/"+uuid+"." + prefix);
+                map2.put("src","/hadoop/yunpansysimg/"+uuid+"." + prefix);
                 return map;
             }
         }catch (Exception e){

@@ -5,7 +5,7 @@
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>全部文件</title>
+    <title>搜索</title>
     <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all">
     <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
     <script src="../static/layui-v2.2.5/layui.js"></script>
@@ -17,16 +17,16 @@
 <div>
     <div class="layui-inline">
         <div class="layui-btn-group">
-            <button class="layui-btn " type="button" id="share">分享</button>
-            <button class="layui-btn" type="button" id="deleteall">删除</button>
-            <button class="layui-btn" type="button" id="moveall">移动到</button>
-            <button class="layui-btn" type="button" id="copyall">复制到</button>
+            <button class="layui-btn " type="button" id="share"><i class="iconfont">&#xe608;</i>分享</button>
+            <button class="layui-btn" type="button" id="deleteall"><i class="iconfont">&#xe64f;</i>删除</button>
+            <button class="layui-btn" type="button" id="moveall"><i class="iconfont">&#xe555;</i>移动到</button>
+            <button class="layui-btn" type="button" id="copyall"><i class="iconfont">&#xe62f;</i>复制到</button>
         </div>
     </div>
     <div class="layui-inline" style="float: right">
         <div class="layui-inline"><input name="kws" class="layui-input" placeholder="搜索 文件名"
                                          autocomplete="off" id="seaarchtxt"></div>
-        <button class="layui-btn" id="search"><i class="layui-icon layui-icon-search"></i></button>
+        <button class="layui-btn" id="search"><i class="layui-icon ">&#xe615;</i></button>
     </div>
 </div>
 </div>
@@ -41,9 +41,9 @@
 <form action="" id="fileForm" method="post" style="display: none;"></form>
 <script type="text/html" id="barDemo">
     <div class="urp-dropdown urp-dropdown-table">
-        <a class="layui-btn layui-btn-xs" lay-event="shaare">分享</a>
+        <a class="layui-btn layui-btn-xs" lay-event="shaare"><i class="iconfont ">&#xe608;</i></a>
         {{# if(d.type!=0){ }}
-        <a class="layui-btn layui-btn-xs" lay-event="down">下载</a>
+        <a class="layui-btn layui-btn-xs" lay-event="down"><i class="iconfont">&#xe689;</i></a>
         {{# } }}
         <button class="layui-btn layui-btn-primary layui-btn-xs urp-dropdown-btn">
             <i class="layui-icon layui-icon-down">&#xe65f;</i>
@@ -174,7 +174,7 @@
                         }
                     }
                     , {field: 'fatherfoldername', title: '所在目录', templet: function (row) {
-                            return "<a onclick='top.addtap(\"/hadoop/fileAndFolder/allFile?fatherFolderid=" + row.fatherfolderid + "\"," + row.fatherfolderid+ ",\"" + row.fatherfoldername + "\")'>" + row.fatherfoldername + "</a>";
+                            return "<a onclick='top.addtap(\"/hadoop/fileAndFolder/allFile?fatherFolderid=" + row.fatherfolderid + "\",\"" + row.fatherfolderid+ "\",\"" + row.fatherfoldername + "\")'>" + row.fatherfoldername + "</a>";
                         }}
                     , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150, align: "center"}
                 ]

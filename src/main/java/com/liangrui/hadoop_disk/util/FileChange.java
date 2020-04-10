@@ -47,7 +47,9 @@ public class FileChange{
         out.close();
     }
     public static String encodeBase64File(MultipartFile mfile) throws Exception {
-        File file= new File(mfile.getOriginalFilename());
+        String fileName= mfile.getOriginalFilename();
+        fileName = fileName.substring(fileName.lastIndexOf('\\')+1);
+        File file= new File(fileName);
         FileUtils.copyInputStreamToFile(mfile.getInputStream(),file);
         FileInputStream inputFile = new FileInputStream(file);
         byte[] buffer = new byte[(int) file.length()];

@@ -48,6 +48,7 @@ public class HDFSUtil {
         RowkeyUtil rowkeyUtil=new RowkeyUtil();
         //用rowkey作为唯一表示
         String fileName = mfile.getOriginalFilename();
+        fileName = fileName.substring(fileName.lastIndexOf('\\')+1);
         String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
         System.out.println(suffix);
         String localPath="D:\\uploadtemp\\"+rowkeyUtil.getRowkey()+'.'+suffix;

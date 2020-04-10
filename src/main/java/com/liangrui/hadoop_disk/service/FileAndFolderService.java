@@ -32,4 +32,7 @@ public interface FileAndFolderService {
     int delterecycle(int userid, String fileOrFolderid, int type);//是文件还是文件夹
     int recycle(int userid, String folderid, int type);
     String getrootFolder(int userid);
+    //搜索
+    List<FileAndFolderDto> searchpublic(String text,List<Integer> integers);
+    public List<FileAndFolderDto> findPublicAllFileAndFolder(String fatherFolderid);
 }

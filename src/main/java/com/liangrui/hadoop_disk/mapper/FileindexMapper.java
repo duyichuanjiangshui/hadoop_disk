@@ -84,7 +84,11 @@ public interface FileindexMapper {
             "where fatherFolderid = #{fatherFolderid}  and isDelete=0"
     })
     List<Fileindex> selectByFatherFolder(String fatherFolderid);
-
+    @Select({
+            "select  * from fileindex "+
+                    "where fatherFolderid = #{fatherFolderid} and shareType = 1 and isDelete=0"
+    })
+    List<Fileindex> selectPublicByFatherFolder(String fatherFolderid);
     @Select("SELECT * from fileindex where   name= #{name} and fatherFolderid= #{fatherFolderid} and groupId is null and isDelete=0 limit 1")
     Fileindex selectByname( @Param("name") String name, @Param("fatherFolderid") String fatherFolderid);
     @Select("SELECT * from fileindex WHERE userId= #{userId} and isDelete=0 and groupId is null and  `name` like '%${name}%'")
@@ -99,5 +103,9 @@ public interface FileindexMapper {
     List<Fileindex> selectGroupFileByLikeName( int groupid,@Param("name") String name);
     @Select("SELECT * from fileindex WHERE   groupId=#{groupid} and  userId= #{userid}")
     List<Fileindex> selectGroupfileByuserid( int groupid,int userid);
+    @Select("SELECT * from fileindex WHERE shareType = 1 and isDelete=0 and groupId is null and  `name` like '%${name}%'")
+    List<Fileindex> selectAllPublicByLikeName(@Param("name") String name);
+    @Select("SELECT * from fileindex WHERE shareType = 1 and isDelete=0 and sortype=#{type} and groupId is null and  `name` like '%${name}%'")
+    List<Fileindex> selectByTypePublicByLikeName(@Param("name") String name,int type);
 
 }

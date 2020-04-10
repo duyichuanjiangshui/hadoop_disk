@@ -60,7 +60,33 @@ public class FileAndFolderServiceImpl implements FileAndFolderService {
 
         return list2;
     }
+    @Override
+    public List<FileAndFolderDto> findPublicAllFileAndFolder(String fatherFolderid) {
+        List<Folder> list = folderMapper.selectPublicByFatherFolder(fatherFolderid);
+        List<Fileindex> list1 = fileindexMapper.selectPublicByFatherFolder(fatherFolderid);
+        List<FileAndFolderDto> list2 = new ArrayList<>();
+        for (Folder folder : list) {
+            FileAndFolderDto fileAndFolderDto = new FileAndFolderDto();
+            fileAndFolderDto.setId(folder.getFolderid());
+            fileAndFolderDto.setName(folder.getName());
+            fileAndFolderDto.setSharetype(folder.getSharetype());
+            fileAndFolderDto.setUpdatetime(folder.getUpdatetime());
+            list2.add(fileAndFolderDto);
+        }
+        for (Fileindex fileindex : list1) {
+            FileAndFolderDto fileAndFolderDto = new FileAndFolderDto();
+            fileAndFolderDto.setId(String.valueOf(fileindex.getFileid()));
+            fileAndFolderDto.setName(fileindex.getName());
+            fileAndFolderDto.setUpdatetime(fileindex.getUpdatetime());
+            fileAndFolderDto.setType(1);
+            fileAndFolderDto.setSize(fileindex.getSize());
+            fileAndFolderDto.setFiletype(fileindex.getFiletype());
+            fileAndFolderDto.setSharetype(fileindex.getSharetype());
+            list2.add(fileAndFolderDto);
+        }
 
+        return list2;
+    }
     @Override
     public int addFolder(String filename, String fatherFolderid, int userid) {
         Folder folder=new Folder();
@@ -547,5 +573,69 @@ public class FileAndFolderServiceImpl implements FileAndFolderService {
     public String getrootFolder(int userid) {
         Diskuser diskuser=diskuserMapper.selectByPrimaryKey(userid);
         return diskuser.getRootfolderid();
+    }
+
+    @Override
+    public List<FileAndFolderDto> searchpublic(String text, List<Integer> integers) {
+        List<FileAndFolderDto> list2 = new ArrayList<>();
+        if(integers==null)
+        {
+            List<Folder> list=folderMapper.selectAllPublicByLikeName(text);
+            List<Fileindex> list1=fileindexMapper.selectAllPublicByLikeName(text);
+            for(Folder folder:list)
+            {
+                FileAndFolderDto fileAndFolderDto=new FileAndFolderDto();
+                fileAndFolderDto.setId(folder.getFolderid());
+                fileAndFolderDto.setName(folder.getName());
+                fileAndFolderDto.setSharetype(folder.getSharetype());
+                fileAndFolderDto.setUpdatetime(folder.getUpdatetime());
+                list2.add(fileAndFolderDto);
+            }
+            for(Fileindex fileindex:list1)
+            {
+                FileAndFolderDto fileAndFolderDto=new FileAndFolderDto();
+                fileAndFolderDto.setId(String.valueOf(fileindex.getFileid()));
+                fileAndFolderDto.setName(fileindex.getName());
+                fileAndFolderDto.setUpdatetime(fileindex.getUpdatetime());
+                fileAndFolderDto.setType(1);
+                fileAndFolderDto.setSize(fileindex.getSize());
+                fileAndFolderDto.setFiletype(fileindex.getFiletype());
+                fileAndFolderDto.setSharetype(fileindex.getSharetype());
+                list2.add(fileAndFolderDto);
+            }
+            return list2;
+        }
+        for(Integer i:integers)
+        {
+            if(i==5)
+            {
+                List<Folder> list=folderMapper.selectAllPublicByLikeName(text);
+                for(Folder folder:list)
+                {
+
+                    FileAndFolderDto fileAndFolderDto=new FileAndFolderDto();
+                    fileAndFolderDto.setId(folder.getFolderid());
+                    fileAndFolderDto.setName(folder.getName());
+                    fileAndFolderDto.setSharetype(folder.getSharetype());
+                    fileAndFolderDto.setUpdatetime(folder.getUpdatetime());
+                    list2.add(fileAndFolderDto);
+                }
+            }else{
+                List<Fileindex> list1=fileindexMapper.selectByTypePublicByLikeName(text,i);
+                for(Fileindex fileindex:list1)
+                {
+                    FileAndFolderDto fileAndFolderDto=new FileAndFolderDto();
+                    fileAndFolderDto.setId(String.valueOf(fileindex.getFileid()));
+                    fileAndFolderDto.setName(fileindex.getName());
+                    fileAndFolderDto.setUpdatetime(fileindex.getUpdatetime());
+                    fileAndFolderDto.setType(1);
+                    fileAndFolderDto.setSize(fileindex.getSize());
+                    fileAndFolderDto.setFiletype(fileindex.getFiletype());
+                    fileAndFolderDto.setSharetype(fileindex.getSharetype());
+                    list2.add(fileAndFolderDto);
+                }
+            }
+        }
+        return list2;
     }
 }

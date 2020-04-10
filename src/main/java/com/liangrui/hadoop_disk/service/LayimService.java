@@ -12,4 +12,5 @@ public interface LayimService {
     List<LayimUserModel> searchUserbyname(String name);
     List<LayimGroupModel> searchGroupbyname(String name);
     List<LayimMsgboxModel> getMsgbox(int userid);
+    List<LayimUserModel> getnumberbygroupid(int groupid);
 }

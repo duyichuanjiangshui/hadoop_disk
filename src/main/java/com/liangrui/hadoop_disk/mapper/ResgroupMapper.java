@@ -58,7 +58,7 @@ public interface ResgroupMapper {
     @Select("select * from resgroup where `name` like '%${name}%'")
     List<Resgroup> selectgroupsbyname(String name);
 
-    @Select("select * from resgroup where 'name'=#{name}")
+    @Select("select * from resgroup where `name` =#{name}")
     Resgroup selectresgroupbyname(String name);
 
 }

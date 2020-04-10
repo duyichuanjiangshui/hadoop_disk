@@ -5,12 +5,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.liangrui.hadoop_disk.bean.dto.FileAndFolderDto;
 import com.liangrui.hadoop_disk.bean.dto.FolderDto;
 import com.liangrui.hadoop_disk.bean.dto.LayuiTree;
+import com.liangrui.hadoop_disk.bean.entity.Diskuser;
 import com.liangrui.hadoop_disk.bean.entity.Resgroup;
 import com.liangrui.hadoop_disk.bean.entity.Sharefile;
 import com.liangrui.hadoop_disk.bean.model.MyShareModel;
 import com.liangrui.hadoop_disk.service.FileAndFolderService;
 import com.liangrui.hadoop_disk.service.GroupFileService;
 import com.liangrui.hadoop_disk.service.ShareService;
+import com.liangrui.hadoop_disk.service.UserService;
 import com.liangrui.hadoop_disk.util.RowkeyUtil;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,8 @@ public class shareController {
     private ShareService shareService;
     @Autowired
     private GroupFileService groupFileService;
+    @Autowired
+    private UserService userService;
 
     @RequestMapping("/sharePage")
     public String sharePage(Model model )
@@ -60,7 +64,7 @@ public class shareController {
         return data;
     }
     @RequestMapping("/s")
-    public String getshare(String shareUrl,Model model)
+    public String getshare(String shareUrl,Model model,HttpServletRequest httpServletRequest)
     {
         Sharefile sharefile=shareService.getfilebyShareurl(shareUrl);
         if(sharefile==null)
@@ -77,6 +81,9 @@ public class shareController {
                 model.addAttribute("flag",1);
             }
         }
+        int userid=  (int) httpServletRequest.getSession().getAttribute("userid");
+        Diskuser diskuser1=userService.finddiskuserbyuserid(userid);
+        model.addAttribute("imgsrc",diskuser1.getImgpath());
         model.addAttribute("shareUrl",shareUrl);
         return "getfilefromurl";
     }

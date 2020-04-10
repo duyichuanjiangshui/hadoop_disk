@@ -82,4 +82,16 @@ public class LayimController {
         return rs;
     }
 
+    @RequestMapping("/getnumbers")
+    @ResponseBody
+    public Map<String, Object> getnumbers(int id)
+    {
+        Map<String, Object> rs=new HashMap<>();
+        List<LayimUserModel> list=layimService.getnumberbygroupid(id);
+        rs.put("code", 0);
+        Map<String,Object> war = new HashMap<String,Object>();
+        war.put("list", list);
+        rs.put("data",war);
+        return rs;
+    }
 }

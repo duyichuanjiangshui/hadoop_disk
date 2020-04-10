@@ -48,23 +48,22 @@ public interface DiskuserMapper {
     })
     Diskuser selectByPrimaryKey(Integer userid);
 
-    @Update({
-            "update diskuser",
-            "set rootfolderid = #{rootfolderid,jdbcType=VARCHAR},",
-            "sign = #{sign,jdbcType=VARCHAR},",
-            "password = #{password,jdbcType=VARCHAR},",
-            "name = #{name,jdbcType=VARCHAR},",
-            "phone = #{phone,jdbcType=VARCHAR},",
-            "imgPath = #{imgpath,jdbcType=VARCHAR},",
-            "email = #{email,jdbcType=VARCHAR},",
-            "statue = #{statue,jdbcType=INTEGER},",
-            "createTime = #{createtime,jdbcType=VARCHAR}",
-            "where userId = #{userid,jdbcType=INTEGER}"
-    })
+    @Update("<script> update diskuser<set ><if test=\"rootfolderid != null\" >    rootfolderid = #{rootfolderid,jdbcType=VARCHAR},  </if> <if test=\"sign != null\" >sign = #{sign,jdbcType=VARCHAR},</if><if test=\"password != null\" >password = #{password,jdbcType=VARCHAR},</if><if test=\"name != null\" >name = #{name,jdbcType=VARCHAR},</if><if test=\"phone != null\" >phone = #{phone,jdbcType=VARCHAR},</if><if test=\"imgpath != null\" >imgPath = #{imgpath,jdbcType=VARCHAR},</if><if test=\"email != null\" >email = #{email,jdbcType=VARCHAR},</if><if test=\"statue != null\" >statue = #{statue,jdbcType=INTEGER},</if><if test=\"createtime != null\" >createTime " +
+            "= #{createtime,jdbcType=VARCHAR},</if></set>where userId = #{userid,jdbcType=INTEGER}</script>")
     int updateByPrimaryKey(Diskuser record);
-    @Select("select * from diskuser where `name`=#{name}")
+    @Select("select * from diskuser where `name`=#{name} or email=#{name}")
     Diskuser selectbyname(String name);
+    @Update("update diskuser set password=#{password} where email=#{email}")
+    int updatepassword(String password,String email);
 
+    @Select("select password from diskuser where userId = #{userid}")
+    String getpasswordbydiskuser(int userid);
     @Select("select * from diskuser where `name` like '%${name}%'")
     List<Diskuser > selectusersbyname(String name);
+    @Select("SELECT userId from diskuser where name=#{name}")
+    Integer getuserId(String name);
+    @Select("SELECT userId from diskuser where email=#{email}")
+    Integer getuserIdbyemail(String email);
+    @Select("select * from diskuser where userId in (select userId from groupnumber where groupId = #{groupid})")
+    List<Diskuser> selectuserformgroupid (int groupid);
 }

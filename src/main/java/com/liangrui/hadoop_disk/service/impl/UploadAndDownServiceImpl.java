@@ -26,6 +26,7 @@ public class UploadAndDownServiceImpl implements UploadAndDownService {
     @Transactional(rollbackFor = {RuntimeException.class, Error.class})
     public int uploadFile(MultipartFile file,int userid,String fatherFolderid) {
         String fileName = file.getOriginalFilename();
+        fileName = fileName.substring(fileName.lastIndexOf('\\')+1);
         String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);//获取文件类型
         int sorttype=SortFileUtil.sortFile(suffix);
         //小于10MB的存入hbase
@@ -33,13 +34,13 @@ public class UploadAndDownServiceImpl implements UploadAndDownService {
         Upload upload=new Upload();
         upload.setUserid(userid);
         upload.setUploadtime(nowtime);
-        upload.setOrignalname(file.getOriginalFilename());
+        upload.setOrignalname(fileName);
         upload.setUsernum(1);
         Fileindex fileindex=new Fileindex();
         fileindex.setUserid(userid);
         fileindex.setIsdelete(0);
         fileindex.setSharetype(0);
-        fileindex.setName(file.getOriginalFilename());
+        fileindex.setName(fileName);
         fileindex.setSavenum(1);
         fileindex.setSize((float) file.getSize());
         fileindex.setUploadtime(nowtime);

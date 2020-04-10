@@ -5,7 +5,7 @@
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>全部文件</title>
+    <title>还原</title>
     <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all">
     <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
     <script src="../static/layui-v2.2.5/layui.js"></script>
@@ -16,8 +16,8 @@
 <div>
     <div class="layui-inline">
         <div class="layui-btn-group">
-            <button class="layui-btn" type="button" id="recycleall">还原</button>
-            <button class="layui-btn" type="button" id="deleteall">删除</button>
+            <button class="layui-btn" type="button" id="recycleall"><i class="iconfont">&#xe70f;</i>还原</button>
+            <button class="layui-btn" type="button" id="deleteall"><i class="iconfont">&#xe64f;</i>删除</button>
         </div>
     </div>
 </div>
@@ -32,8 +32,8 @@
 <!--用隐藏表单实现下载-->
 <script type="text/html" id="barDemo">
     <div class="urp-dropdown urp-dropdown-table">
-        <a class="layui-btn layui-btn-xs" lay-event="recycle">还原</a>
-        <a class="layui-btn layui-btn-xs" lay-event="del">删除</a>
+        <a class="layui-btn layui-btn-xs" lay-event="recycle"><i class="iconfont">&#xe70f;</i>还原</a>
+        <a class="layui-btn layui-btn-xs" lay-event="del"><i class="iconfont">&#xe64f;</i>删除</a>
     </div>
 </script>
 <script th:inline="javascript">
@@ -58,26 +58,28 @@
                     {
                         field: 'type', align: 'center', width: 50, templet: function (row) {
                             if (row.type === 0) {
-                                return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe737;</i>";
+                                return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe737;</i>";
                             } else {
                                 if (row.filetype === "rar" || row.filetype === "zip")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe634;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe634;</i>";
                                 else if (row.filetype === "mp4" || row.filetype === "mov")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe66f;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe66f;</i>";
                                 else if (row.filetype === "pdf")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8e8;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8e8;</i>";
                                 else if (row.filetype === "mps" || row.filetype === "wma")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe602;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe602;</i>";
                                 else if (row.filetype === "txt")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe63b;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe63b;</i>";
                                 else if (row.filetype === "docx")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8ac;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8ac;</i>";
                                 else if (row.filetype === "exe")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8ac;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8a7;</i>";
                                 else if (row.filetype === "apk")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe68d;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe68d;</i>";
+                                else if (row.filetype === "jpg" || row.filetype === "jpeg" || row.filetype === "png" || row.filetype === "gif")
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe656;</i>";
                                 else
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe65b;</i>";
+                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe655;</i>";
 
 
                             }

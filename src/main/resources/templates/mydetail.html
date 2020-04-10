@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>我的资料</title>
+    <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
+    <script src="../static/layui-v2.2.5/layui.js"></script>
+    <script src="../static/js/clipboard.min.js"></script>
+    <style>
+        .beg-login-icon {
+            position: absolute;
+            color: #cccccc;
+            top: 10px;
+            left: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-body" >
+    <div class=" layui-show"><div class="layui-card layadmin-header">
+    </div><div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">设置我的资料</div>
+                    <div class="layui-card-body" pad15="">
+
+                        <form class="layui-form" id="form2"  onsubmit="return false">
+                            <div class="layui-form-item">
+                                <input name="userid" th:value="${user.getUserid()}" style="display: none">
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <div class="layui-inline">
+                                        <label class="beg-login-icon layui-inline">
+                                            <i class="layui-icon">&#xe612;</i>
+                                        </label>
+                                        <input type="text" id="registerName" name="name" lay-verify="required"
+                                               th:value="${user.getName()}"
+                                               autocomplete="off" style="padding-left: 34px;"
+                                               placeholder="这里输入用户名" class="layui-input">
+                                    </div>
+                                    <!-- 对号 -->
+                                    <div class="layui-inline">
+                                        <i class="layui-icon" id="ri" style="color: green;font-weight: bolder;"
+                                           hidden></i>
+                                    </div>
+                                    <!-- 错号 -->
+                                    <div class="layui-inline">
+                                        <i class="layui-icon" id="wr" style="color: red; font-weight: bolder;"
+                                           hidden>ဆ</i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <div class="layui-inline">
+                                        <label class="beg-login-icon">
+                                            <i class="layui-icon">&#xe642;</i>
+                                        </label>
+                                        <input id="phone" autocomplete="off" lay-verify="required"
+                                               style="padding-left: 34px;" name="phone" th:value="${user.getPhone()}"
+                                               placeholder="这里输入手机号" class="layui-input">
+                                    </div>
+                                    <div class="layui-inline">
+                                        <i class="layui-icon" id="phoneri" style="color: green;font-weight: bolder;"
+                                           hidden></i>
+                                    </div>
+                                    <!-- 错号 -->
+                                    <div class="layui-inline">
+                                        <i class="layui-icon" id="phonewr" style="color: red; font-weight: bolder;"
+                                           hidden>ဆ</i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <div class="layui-inline">
+                                        <label class="beg-login-icon">
+                                            <i class="layui-icon">&#xe642;</i>
+                                        </label>
+                                        <input id="email" autocomplete="off" lay-verify="required"
+                                               style="padding-left: 34px;" name="email" th:value="${user.getEmail()}"
+                                               placeholder="这里输入邮箱" class="layui-input">
+                                    </div>
+                                    <div class="layui-inline">
+                                        <i class="layui-icon" id="emailri" style="color: green;font-weight: bolder;"
+                                           hidden></i>
+                                    </div>
+                                    <!-- 错号 -->
+                                    <div class="layui-inline">
+                                        <i class="layui-icon" id="emailwr" style="color: red; font-weight: bolder;"
+                                           hidden>ဆ</i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <textarea placeholder="请编辑签名" name="sign" style="width: 195px;height: 50px" th:text="${user.getSign()}"
+                                              autocomplete="off" class="layui-input"></textarea>
+                                </div>
+                            </div>
+                            <div clas="layui-form-item">
+                                <div class="layui-input-block">
+
+                                    <!--************这里添加的隐藏的输入框，用来传递images的参数***************-->
+
+                                    <div class="layui-upload" style="width: 100%">
+                                        <button type="button" class="layui-btn" id="test1"><i class="layui-icon">&#xe67c;</i>头像</button>
+                                        <div class="layui-inline">
+                                            <div class="layui-upload-list" >
+                                                <img class="layui-upload-img" th:src="${user.getImgpath()}" id="demo1" style="width: 100px;height: 100px">
+                                                <p id="demoText"></p>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" th:value="${user.getImgpath()}" name="imgpath" class="image">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="formStep2">
+                                        &emsp;确认修改
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<script>
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test1'
+            ,url: 'http://localhost:8000/hadoop/uploadAndDown/uploadImg'
+            ,accept:'images'
+            ,size:500000
+            ,before: function(obj){
+
+                obj.preview(function(index, file, result){
+
+                    $('#demo1').attr('src', result);
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                }
+                //上传成功
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #4cae4c;">上传成功</span>');
+
+                var fileupload = $(".image");
+                fileupload.attr("value",res.data.src);
+                console.log(fileupload.attr("value"));
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+
+
+    });
+</script>
+<script>
+    layui.use(['form'], function () {
+        var $ = layui.$
+            , form = layui.form;
+        $("#ri").val(1);
+        $("#phoneri").val(1);
+        $("#emailri").val(1);
+
+        $('#registerName').blur(function () {
+            var user = $(this).val();
+
+            //alert(user);
+            if(user!="[[${user.getName()}]]")
+            $.ajax({
+                url: '/hadoop/user/havename',
+                dataType: 'text',
+                data: {user: user},
+                //验证用户名是否可用
+                success: function (data) {
+                    if (data == 0) {
+                        $('#ri').removeAttr('hidden');
+                        $('#ri').val(1);
+                        $('#wr').attr('hidden', 'hidden');
+                    } else {
+                        $('#wr').removeAttr('hidden');
+                        $("ri").val(0);
+                        $('#ri').attr('hidden', 'hidden');
+                        layer.msg('当前用户名已被占用! ')
+
+                    }
+
+                }
+            });
+            else {
+                $('#ri').removeAttr('hidden');
+                $('#ri').val(1);
+                $('#wr').attr('hidden', 'hidden');
+            }
+
+
+        });
+
+
+        $("#phone").blur(function () {
+            var reg = /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/;
+            if (!($('#phone').val().match(reg))) {
+                //layer.msg('请输入合法密码');
+                $('#phonewr').removeAttr('hidden');
+                $('#phoneri').attr('hidden', 'hidden');
+                $("#phoneri").val(0);
+                layer.msg('您的输入有误，请重新输入(中国11位手机号)');
+            } else {
+                $('#phoneri').removeAttr('hidden');
+                $('#phoneri').val(1);
+                $('#phonewr').attr('hidden', 'hidden');
+            }
+        });
+        $('#email').blur(function () {
+            var reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+            if (!($('#email').val().match(reg))) {
+                //layer.msg('请输入合法密码');
+                $('#emailwr').removeAttr('hidden');
+                $('#emailri').attr('hidden', 'hidden');
+                layer.msg('请输入正确的邮箱格式：<br>如：xxx@qq.com<br>xxx@163.com等格式');
+            } else {
+                if($("#email").val()!="[[${user.getEmail()}]]")
+                $.ajax({
+                    url: '/hadoop/user/haveemail',
+                    dataType: 'text',
+                    data: {email: $(this).val()},
+                    //验证用户名是否可用
+                    success: function (data) {
+                        if (data == 0) {
+                            $('#emailri').removeAttr('hidden');
+                            $('#emailwr').attr('hidden', 'hidden');
+                            $('#emailri').val(1);
+                        } else {
+                            $('#emailwr').removeAttr('hidden');
+                            $('#emailri').attr('hidden', 'hidden');
+                            $('#emailri').val(0);
+                            layer.msg('当前邮箱已被占用! ')
+
+                        }
+
+                    }
+                })
+            }
+        });
+        form.on('submit(formStep2)', function (data) {
+            console.log(JSON.stringify(data.field));
+            if($('#phoneri').val()==1&&$('#emailri').val()==1&&$("#ri").val()==1)
+                $.ajax({
+                    type: "POST",
+
+                    url: "/hadoop/user/updatemydetail",
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify(data.field),
+                    dataType: "json",
+                    success: function (result) {
+                        if (result.code !=0) {
+                            layer.msg('更改失败!');
+                        } else {
+                            layer.msg('更改成功!');
+                        }
+                    }
+                });
+
+        })
+    })
+
+</script>
+</body>
+</html>

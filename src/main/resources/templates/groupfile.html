@@ -32,20 +32,20 @@
 <div id="guidediv"></div>
 <div>
     <button class="layui-btn layui-btn-primary" type="button" id="addFolder">
-        <i class="layui-icon" style="font-size: 30px; color: #1E9FFF;">&#xe628;</i>新建文件夹
+        <i class="iconfont" style="font-size: 30px; color: #1E9FFF;">&#xe628;</i>新建文件夹
     </button>
 
     <div class="layui-inline">
         <div class="layui-btn-group">
-            <button class="layui-btn"  th:if="${isowner}==1" type="button" id="deleteall">删除</button>
+            <button class="layui-btn"  th:if="${isowner}==1" type="button" id="deleteall"><i class="iconfont">&#xe64f;</i>删除</button>
             <button class="layui-btn" type="button" id="copyall">保存云盘到</button>
         </div>
     </div>
     <div class="layui-inline" style="float: right">
-    <div class="layui-inline"><input name="kws" class="layui-input" placeholder="搜索 文件名"
-                                     autocomplete="off" id="seaarchtxt"></div>
-    <button class="layui-btn" id="search"><i class="layui-icon layui-icon-search"></i></button>
-</div>
+        <div class="layui-inline"><input name="kws" class="layui-input" placeholder="搜索 文件名"
+                                         autocomplete="off" id="seaarchtxt"></div>
+        <button class="layui-btn" id="search"><i class="layui-icon ">&#xe615;</i></button>
+    </div>
 </div>
 </div>
 <div class="layui-container layui-side-scroll" style="margin: 0; width: 100%; padding: 5px 15px;">
@@ -61,9 +61,9 @@
     <div class="urp-dropdown urp-dropdown-table">
         <a class="layui-btn layui-btn-xs" lay-event="save">保存到云盘</a>
         {{# if(d.type!=0){ }}
-        <a class="layui-btn layui-btn-xs" lay-event="down">下载</a>
+        <a class="layui-btn layui-btn-xs" lay-event="down"><i class="iconfont">&#xe689;</i></a>
         {{# } }}
-        <a th:if="${isowner}==1" class="layui-btn layui-btn-xs" lay-event="del">删除</a>
+        <a th:if="${isowner}==1" class="layui-btn layui-btn-xs" lay-event="del"><i class="iconfont">&#xe64f;</i>删除</a>
     </div>
 </script>
 <script th:inline="javascript">
@@ -158,7 +158,7 @@
                 break;
             }
         }
-        for( i=1;i<guide.length-temp;i++)
+        for( i=1;i<=guide.length-temp;i++)
         {
             guide.pop();
             guideid.pop();
@@ -204,32 +204,34 @@
                     {
                         field: 'type', align: 'center', width: 50, templet: function (row) {
                             if (row.type === 0) {
-                                return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe737;</i>";
+                                return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe737;</i>";
                             } else {
                                 if (row.filetype === "rar" || row.filetype === "zip")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe634;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe634;</i>";
                                 else if (row.filetype === "mp4" || row.filetype === "mov")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe66f;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe66f;</i>";
                                 else if (row.filetype === "pdf")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8e8;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8e8;</i>";
                                 else if (row.filetype === "mps" || row.filetype === "wma")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe602;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe602;</i>";
                                 else if (row.filetype === "txt")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe63b;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe63b;</i>";
                                 else if (row.filetype === "docx")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8ac;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8ac;</i>";
                                 else if (row.filetype === "exe")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8ac;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe8a7;</i>";
                                 else if (row.filetype === "apk")
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe68d;</i>";
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe68d;</i>";
+                                else if (row.filetype === "jpg" || row.filetype === "jpeg" || row.filetype === "png" || row.filetype === "gif")
+                                    return "<i class=\"iconfont\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe656;</i>";
                                 else
-                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe65b;</i>";
+                                    return "<i class=\"layui-icon\" style=\"font-size: 30px; color: #1E9FFF;\">&#xe655;</i>";
 
 
                             }
                         }
                     }
-                    , {
+                    ,  {
                     field: 'name', title: '文件名', sort: true, templet: function (row) {
                         if (row.type === 0) {
                             return "<a onclick='reloadtab(\""+row.id+"\",\""+row.name+"\")'>" + row.name + "</a>";

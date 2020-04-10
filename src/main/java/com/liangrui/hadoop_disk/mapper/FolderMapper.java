@@ -71,7 +71,11 @@ public interface FolderMapper {
             "where fatherFolderId = #{fatherFolderid} and isDelete=0 "
     })
     List<Folder> selectByFatherFolder(String fatherFolderid);
-
+    @Select({
+            "select * from folder "+
+                    "where sharetype=1 and fatherFolderId = #{fatherFolderid} and isDelete=0 "
+    })
+    List<Folder> selectPublicByFatherFolder(String fatherFolderid);
     @Select({
             "select * from folder "+
             "where  userId=#{userid} and isDelete=0 and groupId is null"
@@ -93,4 +97,7 @@ public interface FolderMapper {
                     "where   groupId =#{groupid}"
     })
     List<Folder> selectByGroupid(int groupid);
+    @Select("SELECT * from folder where sharetype=1 and isDelete=0 and groupId is null and `name` like '%${name}%'")
+    List<Folder> selectAllPublicByLikeName(@Param("name") String name);
+
 }
