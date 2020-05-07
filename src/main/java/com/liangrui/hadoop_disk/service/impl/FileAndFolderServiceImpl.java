@@ -112,16 +112,13 @@ public class FileAndFolderServiceImpl implements FileAndFolderService {
     @Override
     public int delteFolder(String folderid) {
        //删除其实是伪善除
-        Folder folder=folderMapper.selectByPrimaryKey(folderid);
-        folder.setIsdelete(1);
-        folder.setDeletetime(DateUtil.DateToString("yyyy-MM-dd HH:mm:ss", new Date()));
-
-        return folderMapper.updateByPrimaryKey(folder);
+        return folderMapper.updateisdelete(1, folderid,DateUtil.DateToString("yyyy-MM-dd HH:mm:ss", new Date()));
     }
 
     @Override
     public int updateFoler(String foldername, String folderid) {
-        Folder folder=folderMapper.selectByPrimaryKey(folderid);
+        Folder folder=new Folder();
+        folder.setFolderid(folderid);
         folder.setUpdatetime(DateUtil.DateToString("yyyy-MM-dd HH:mm:ss", new Date()));
         folder.setName(foldername);
         return folderMapper.updateByPrimaryKey(folder);
@@ -131,11 +128,14 @@ public class FileAndFolderServiceImpl implements FileAndFolderService {
     public int changesharetype(int sharetype, int type, String fileid) {
         if(type==0)
         {
-            Folder folder=folderMapper.selectByPrimaryKey(fileid);
+            Folder folder=new Folder();
+            folder.setFolderid(fileid);
             folder.setSharetype(sharetype);
             return folderMapper.updateByPrimaryKey(folder);
         }else{
-            Fileindex fileindex=fileindexMapper.selectByPrimaryKey(Integer.parseInt(fileid));
+            Fileindex fileindex=new Fileindex();
+            fileindex.setFileid(Integer.valueOf(fileid));
+            fileindex.setFileid(Integer.valueOf(fileid));
             fileindex.setSharetype(sharetype);
             return fileindexMapper.updateByPrimaryKey(fileindex);
         }
@@ -148,7 +148,8 @@ public class FileAndFolderServiceImpl implements FileAndFolderService {
         return fileindex!=null;
     }
     public int updateFileName(String filname, int fileid) {
-        Fileindex fileindex=fileindexMapper.selectByPrimaryKey(fileid);
+        Fileindex fileindex=new Fileindex();
+        fileindex.setFileid(Integer.valueOf(fileid));
         fileindex.setUpdatetime(DateUtil.DateToString("yyyy-MM-dd HH:mm:ss", new Date()));
         fileindex.setName(filname);
         return fileindexMapper.updateByPrimaryKey(fileindex);
@@ -156,7 +157,8 @@ public class FileAndFolderServiceImpl implements FileAndFolderService {
 
     @Override
     public int deleteFile(int fileid) {
-        Fileindex fileindex=fileindexMapper.selectByPrimaryKey(fileid);
+        Fileindex fileindex=new Fileindex();
+        fileindex.setFileid(Integer.valueOf(fileid));
         fileindex.setIsdelete(1);
         fileindex.setDeletetime(DateUtil.DateToString("yyyy-MM-dd HH:mm:ss", new Date()));
         return fileindexMapper.updateByPrimaryKey(fileindex);
@@ -330,13 +332,14 @@ public class FileAndFolderServiceImpl implements FileAndFolderService {
         String nowtime=DateUtil.DateToString("yyyy-MM-dd HH:mm:ss", new Date());//把现在的时间转换成字符串
         if(type==0)
         {
-            Folder folder=folderMapper.selectByPrimaryKey(folderid);
+            Folder folder=new Folder();
+            folder.setFolderid(folderid);
             folder.setFatherfolderid(aimFolderid);
             folder.setUpdatetime(nowtime);
             return folderMapper.updateByPrimaryKey(folder);
         }else {
-            Fileindex fileindex=fileindexMapper.selectByPrimaryKey(Integer.parseInt(folderid));
-
+            Fileindex fileindex=new Fileindex();
+            fileindex.setFileid(Integer.valueOf(folderid));
             fileindex.setFatherfolderid(aimFolderid);
             fileindex.setUpdatetime(nowtime);
             return fileindexMapper.updateByPrimaryKey(fileindex);
@@ -523,14 +526,13 @@ public class FileAndFolderServiceImpl implements FileAndFolderService {
     public int delterecycle(int userid, String fileOrFolderid, int type) {
         if(type==1)
         {
-            Fileindex fileindex=fileindexMapper.selectByPrimaryKey(Integer.parseInt(fileOrFolderid));
-            Upload upload=uploadMapper.selectByPrimaryKey(fileindex.getUploadlocationid());
+            Upload upload=uploadMapper.selectByPrimaryKey(Integer.valueOf(fileOrFolderid));
             upload.setUsernum(upload.getUsernum()-1);
             uploadMapper.updateByPrimaryKey(upload); //这个资源的用户减一
             return fileindexMapper.deleteByPrimaryKey(Integer.valueOf(fileOrFolderid));
         }else{
             folderMapper.deleteByPrimaryKey(fileOrFolderid);
-            List<FileAndFolderDto> list=findAllFileAndFolder(fileOrFolderid);
+            List<FileAndFolderDto> list=findAllIsOrNoDeleteFileAndFolder(fileOrFolderid);
             while(list.size()>0)
             {
                 List<FileAndFolderDto> list1=new ArrayList<>();
@@ -538,13 +540,12 @@ public class FileAndFolderServiceImpl implements FileAndFolderService {
                 {
                    if(fileAndFolderDto.getType()==1)//是文件就直接删除
                    {
-                       Fileindex fileindex=fileindexMapper.selectByPrimaryKey(Integer.parseInt(fileOrFolderid));
-                       Upload upload=uploadMapper.selectByPrimaryKey(fileindex.getUploadlocationid());
+                       Upload upload=uploadMapper.selectByPrimaryKey(Integer.valueOf(fileOrFolderid));
                        upload.setUsernum(upload.getUsernum()-1);
                        uploadMapper.updateByPrimaryKey(upload);
                        fileindexMapper.deleteByPrimaryKey(Integer.valueOf(fileAndFolderDto.getId()));
                    }else{
-                       List<FileAndFolderDto> list2=findAllFileAndFolder(fileOrFolderid);
+                       List<FileAndFolderDto> list2=findAllIsOrNoDeleteFileAndFolder(fileOrFolderid);
                        list1.addAll(list2);
                        folderMapper.deleteByPrimaryKey(fileAndFolderDto.getId());
                    }
@@ -559,11 +560,14 @@ public class FileAndFolderServiceImpl implements FileAndFolderService {
     @Override
     public int recycle(int userid, String folderid, int type) {
         if (type == 0) {
-            Folder folder = folderMapper.selectByPrimaryKey(folderid);
+            Folder folder = new Folder();
+            folder.setFolderid(folderid);
             folder.setIsdelete(0);
             return folderMapper.updateByPrimaryKey(folder);
         } else
-            {Fileindex fileindex=fileindexMapper.selectByPrimaryKey(Integer.parseInt(folderid));
+            {
+                Fileindex fileindex=new Fileindex();
+                fileindex.setFileid(Integer.valueOf(folderid));
             fileindex.setIsdelete(0);
             return fileindexMapper.updateByPrimaryKey(fileindex);
         }
@@ -637,5 +641,77 @@ public class FileAndFolderServiceImpl implements FileAndFolderService {
             }
         }
         return list2;
+    }
+
+    @Override
+    @Transactional(rollbackFor = {RuntimeException.class, Error.class})
+    public int delrepatUploadid(int userid) {
+        List<Fileindex> list=fileindexMapper.selectrepateuploationid(userid);
+        int flag=-1;
+        int sum=0;
+        for(Fileindex fileindex:list)
+        {
+            if(fileindex.getUploadlocationid()!=flag)
+                flag=fileindex.getUploadlocationid();
+            else {
+              int result=fileindexMapper.updateisdelete(1,fileindex.getFileid(),DateUtil.DateToString("yyyy-MM-dd HH:mm:ss", new Date()));
+              if(result==0)
+                  return -1;
+              sum++;
+            }
+
+        }
+        return sum;
+    }
+
+    @Override
+    @Transactional(rollbackFor = {RuntimeException.class, Error.class})
+    public int delgarbagefile(int userid) {
+        int sum=0;
+        List<Fileindex> list=fileindexMapper.selectgarbage(userid);
+        for(Fileindex fileindex:list)
+        {
+            int result=fileindexMapper.updateisdelete(1,fileindex.getFileid(),DateUtil.DateToString("yyyy-MM-dd HH:mm:ss", new Date()));
+            if(result==0)
+                return -1;
+            sum++;
+        }
+        return sum;
+    }
+
+    @Override
+    public int delemptyfolder(int userid) {
+        List<Folder> list=folderMapper.selectEmptyFolder(userid);
+        int sum=0;
+        for(Folder folder:list)
+        {
+            int result=folderMapper.updateisdelete(1,folder.getFolderid(),DateUtil.DateToString("yyyy-MM-dd HH:mm:ss", new Date()));
+            if(result==0)
+                return -1;
+            sum++;
+        }
+        return sum;
+    }
+
+    @Override
+    public List<FileAndFolderDto> findAllIsOrNoDeleteFileAndFolder(String fatherFolderid) {
+        List<FileAndFolderDto> list=new ArrayList<>();
+        List<Folder> folderList=folderMapper.selectALLByFatherFolder(fatherFolderid);
+        List<Fileindex> fileindexList=fileindexMapper.selectAllByFatherFolder(fatherFolderid);
+        for(Folder k:folderList)
+        {
+            FileAndFolderDto fileAndFolderDto=new FileAndFolderDto();
+            fileAndFolderDto.setId(k.getFolderid());
+            fileAndFolderDto.setType(0);
+            list.add(fileAndFolderDto);
+        }
+        for(Fileindex k:fileindexList)
+        {
+            FileAndFolderDto fileAndFolderDto=new FileAndFolderDto();
+            fileAndFolderDto.setId(String.valueOf(k.getFileid()));
+            fileAndFolderDto.setType(1);
+            list.add(fileAndFolderDto);
+        }
+        return list;
     }
 }

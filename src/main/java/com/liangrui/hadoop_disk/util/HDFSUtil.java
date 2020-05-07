@@ -59,6 +59,7 @@ public class HDFSUtil {
         fs.copyFromLocalFile(new Path(localPath),new Path(aimpath));
         //3 关闭
         System.out.println("over");
+        System.out.println(localPath);
         File del = new File(localPath);//将本地文件删除
         del.delete();
         return aimpath;

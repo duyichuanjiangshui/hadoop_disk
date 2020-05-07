@@ -36,6 +36,8 @@ public class UploadAndDownServiceImpl implements UploadAndDownService {
         upload.setUploadtime(nowtime);
         upload.setOrignalname(fileName);
         upload.setUsernum(1);
+        upload.setSize((float) file.getSize());
+        upload.setSortype(sorttype);
         Fileindex fileindex=new Fileindex();
         fileindex.setUserid(userid);
         fileindex.setIsdelete(0);
@@ -60,6 +62,7 @@ public class UploadAndDownServiceImpl implements UploadAndDownService {
                 HbaseUtil.insertHbaseData(rowKey,bytestream);
                 upload.setUploadlocation(rowKey);
                 upload.setUploadtype(0);
+
                 int flag1=uploadMapper.insert(upload);
                 int uploadLocationid=uploadMapper.selectuploadLocation(rowKey);
                 fileindex.setUploadlocationid(uploadLocationid);
@@ -83,6 +86,7 @@ public class UploadAndDownServiceImpl implements UploadAndDownService {
                 int uploadLocationid=uploadMapper.selectuploadLocation(uploadLoation);
                 fileindex.setUploadlocationid(uploadLocationid);
                 int flag2=fileindexMapper.insert(fileindex);
+
                 return flag1*flag2;
 
             } catch (IOException e) {

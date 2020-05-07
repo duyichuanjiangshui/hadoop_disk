@@ -46,6 +46,8 @@
                 <li class="layui-nav-item"><a data-url="/hadoop/fileAndFolder/alonetypefile?type=4" data-id="other" data-title="其他" class="site-demo-active" href="javascript:;" data-type="tabAdd">其他</a></li>
                 <li class="layui-nav-item"><a data-url="/hadoop/share/mysharepage" data-id="myshare" data-title="我的分享" class="site-demo-active" href="javascript:;" data-type="tabAdd"><i class="iconfont">&#xe6a5;</i> 我的分享</a></li>
                 <li class="layui-nav-item"><a data-url="/hadoop/fileAndFolder/recyclepage" data-id="/recycler" data-title="回收站" class="site-demo-active" href="javascript:;" data-type="tabAdd"> <i class="iconfont">&#xe648;</i> 回收站</a></li>
+                <li class="layui-nav-item"><a data-url="/hadoop/index/quickclean" data-id="/quickclean" data-title="快速清理" class="site-demo-active" href="javascript:;" data-type="tabAdd"> <i class="iconfont">&#xe64f;</i> 快速清理</a></li>
+
             </ul>
         </div>
     </div>
@@ -71,10 +73,17 @@
         console.log(id);
 
         if ($(".layui-tab-title li[lay-id=" + id + "]").length > 0) {
-            if(id=='-1')
-            {
+            //否则判断该tab项是否以及存在
+            var isData = false; //初始化一个标志，为false说明未打开该tab项 为true则说明已有
+            $.each($(".layui-tab-title li[lay-id]"), function () {
+                //如果点击左侧菜单栏所传入的id 在右侧tab项中的lay-id属性可以找到，则说明该tab项已经打开
+                if ($(this).attr("lay-id") == id) {
+                    isData = true;
+                }
+            });
+            if (isData == true) {
                 console.log("删除");
-                element.tabDelete('demo', -1); //删除 lay-id="xxx" 的这一项
+                element.tabDelete('demo', id); //删除 lay-id="xxx" 的这一项
                 element.tabAdd('demo', {
 
                     title: '<span>' + title + '</span>',
@@ -135,11 +144,13 @@
                     if ($(this).attr("lay-id") == dataid.attr("data-id")) {
                         isData = true;
                     }
-                })
-                if (isData == false) {
-                    //标志为false 新增一个tab项
-                    active.tabAdd(dataid.attr("data-url"), dataid.attr("data-id"), dataid.attr("data-title"));
-                }
+                });
+                if (isData == true) {
+                    active.tabDelete(dataid.attr("data-id"));
+                      }
+                //标志为false 新增一个tab项
+                active.tabAdd(dataid.attr("data-url"), dataid.attr("data-id"), dataid.attr("data-title"));
+
             }
             //最后不管是否新增tab，最后都转到要打开的选项页面上
             active.tabChange(dataid.attr("data-id"));
@@ -160,6 +171,7 @@
             },
             tabChange: function (id) {
                 //切换到指定Tab项
+
                 element.tabChange('demo', id); //根据传入的id传入到指定的tab项
             },
             tabDelete: function (id) {

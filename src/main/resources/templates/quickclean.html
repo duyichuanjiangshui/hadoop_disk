@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>全部文件</title>
+    <link rel="stylesheet" href="../static/layui-v2.2.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../static/layui-v2.2.5/myicon/iconfont.css" type="text/css">
+    <script src="../static/layui-v2.2.5/layui.js"></script>
+    <link rel="stylesheet" href="../static/layui-v2.2.5/extend/dropdown.css" media="all">
+</head>
+<body>
+<div class="layui-fluid">
+    <div style="text-align: center; padding:11% 0;">
+
+        <p style="font-size: 35px; font-weight: 200; color: #999;">
+            快速清理垃圾文件，保持盘内整洁
+        </p>
+
+        <div style="padding: 50px">
+            <div class="layui-inline" style="text-align: center">
+                <div style="padding: 25px;">
+                <i class="layui-icon" style=" font-size:150px;  color: #393D50;">&#xe655;</i>
+                </div>
+                <a id="cleanrepeat" style="font-size:20px; color: red">删除重复文件</a>
+            </div>
+            <div class="layui-inline" style="text-align: center">
+                <div style="padding: 25px;">
+                    <i  class="layui-icon" style="font-size:150px;  color: #393D50;">&#xe6ed;</i>
+                </div>
+                <a id="cleangarbage" style="font-size:20px; color: blue">删除垃圾视频</a>
+            </div>
+            <div class="layui-inline" style="text-align: center">
+                <div style="padding: 25px;">
+                    <i class="layui-icon" style="font-size:150px;  color: #393D50;">&#xe628;</i>
+                </div>
+                <a id="cleanempty" style="font-size:20px; color: green">删除空文件夹</a>
+            </div>
+        </div>
+
+        </div>
+
+    </div>
+</div>
+<script>
+    //JavaScript代码区域
+    layui.use(['element', 'layer', 'jquery'], function () {
+        var element = layui.element;
+        var layer = layui.layer;
+        var $ = layui.$;
+        $("#cleanrepeat").click(function () {
+            layer.confirm('确认删除？', function (index) {
+                $.ajax({
+                    url: "/hadoop/fileAndFolder/delrepeat" ,
+                    success: function (message) {
+                        layer.close(index);
+                        if(message.code==0)
+                            layer.msg(message.msg, {icon: 6,
+                                time: 1500
+                            });
+                        else
+                        layer.msg(message.msg, {
+                            icon: 2,
+                            time: 1500
+                        });
+
+                    },
+                    error: function (message) {
+                        console.log(JSON.stringify(message));
+                        layer.msg("删除失败", {
+                            icon: 2,
+                            time: 1500
+                        });
+                    }
+                });
+            });
+        });
+        $("#cleangarbage").click(function () {
+            layer.confirm('确认删除？', function (index) {
+                $.ajax({
+                    url: "/hadoop/fileAndFolder/delgarbage" ,
+                    success: function (message) {
+                        layer.close(index);
+                        if(message.code==0)
+                            layer.msg(message.msg, {icon: 6,
+                                time: 1500
+                            });
+                        else
+                            layer.msg(message.msg, {
+                                icon: 2,
+                                time: 1500
+                            });
+
+                    },
+                    error: function (message) {
+                        console.log(JSON.stringify(message));
+                        layer.msg("删除失败", {
+                            icon: 2,
+                            time: 1500
+                        });
+                    }
+                });
+            });
+        });
+        $("#cleanempty").click(function () {
+            layer.confirm('确认删除？', function (index) {
+                $.ajax({
+                    url: "/hadoop/fileAndFolder/delempty" ,
+                    success: function (message) {
+                        layer.close(index);
+                        if(message.code==0)
+                            layer.msg(message.msg, {icon: 6,
+                                time: 1500
+                            });
+                        else
+                            layer.msg(message.msg, {
+                                icon: 2,
+                                time: 1500
+                            });
+
+                    },
+                    error: function (message) {
+                        console.log(JSON.stringify(message));
+                        layer.msg("删除失败", {
+                            icon: 2,
+                            time: 1500
+                        });
+                    }
+                });
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -15,6 +15,10 @@ public class Upload {
 
     private Integer usernum;
 
+    private Integer sortype;
+
+    private Float size;
+
     public Integer getUploadloationid() {
         return uploadloationid;
     }
@@ -69,5 +73,21 @@ public class Upload {
 
     public void setUsernum(Integer usernum) {
         this.usernum = usernum;
+    }
+
+    public Integer getSortype() {
+        return sortype;
+    }
+
+    public void setSortype(Integer sortype) {
+        this.sortype = sortype;
+    }
+
+    public Float getSize() {
+        return size;
+    }
+
+    public void setSize(Float size) {
+        this.size = size;
     }
 }

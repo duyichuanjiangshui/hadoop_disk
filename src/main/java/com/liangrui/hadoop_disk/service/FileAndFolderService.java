@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface FileAndFolderService {
     List<FileAndFolderDto> findAllFileAndFolder(String fatherFolderid);
+    List<FileAndFolderDto> findAllIsOrNoDeleteFileAndFolder(String fatherFolderid);
     int addFolder(String filename, String fatherFolderid, int userid);
     boolean isexist(String foldername, String fatherFolderid);
     int delteFolder(String folderid);
@@ -34,5 +35,8 @@ public interface FileAndFolderService {
     String getrootFolder(int userid);
     //搜索
     List<FileAndFolderDto> searchpublic(String text,List<Integer> integers);
-    public List<FileAndFolderDto> findPublicAllFileAndFolder(String fatherFolderid);
+     List<FileAndFolderDto> findPublicAllFileAndFolder(String fatherFolderid);
+    int delrepatUploadid(int userid);
+    int delgarbagefile(int userid);
+    int delemptyfolder(int userid);
 }

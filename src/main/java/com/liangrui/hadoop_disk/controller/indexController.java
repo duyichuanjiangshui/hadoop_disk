@@ -108,6 +108,11 @@ public class indexController {
     {
         return "error";
     }
+    @RequestMapping("/quickclean")
+    public String quickkclean()
+    {
+        return "quickclean";
+    }
 
 
 

@@ -536,4 +536,58 @@ public class FolderAndFileController {
         model.addAttribute("imgsrc",diskuser1.getImgpath());
         return "searchpublic";
     }
+    @RequestMapping("/delrepeat")
+    @ResponseBody
+    public Map<String, Object> delrepeat(HttpServletRequest httpServletRequest)
+    {
+        int userid=  (int) httpServletRequest.getSession().getAttribute("userid");
+        Map<String, Object> rs = new HashMap<>();
+
+        int result=fileAndFolderService.delrepatUploadid(userid);
+            if(result!=-1)
+            {
+                rs.put("code", 0);
+                rs.put("msg", "共清理了"+result+"个重复文件");
+            }else {
+                rs.put("code", 1);
+                rs.put("msg", "清理重复文件失败");
+            }
+        return  rs;
+    }
+    @RequestMapping("/delgarbage")
+    @ResponseBody
+    public Map<String, Object> delgarbage(HttpServletRequest httpServletRequest)
+    {
+        int userid=  (int) httpServletRequest.getSession().getAttribute("userid");
+        Map<String, Object> rs = new HashMap<>();
+
+        int result=fileAndFolderService.delgarbagefile(userid);
+        if(result!=-1)
+        {
+            rs.put("code", 0);
+            rs.put("msg", "共清理了"+result+"个垃圾文件");
+        }else {
+            rs.put("code", 1);
+            rs.put("msg", "清理垃圾文件失败");
+        }
+        return  rs;
+    }
+    @RequestMapping("/delempty")
+    @ResponseBody
+    public Map<String, Object> delempty(HttpServletRequest httpServletRequest)
+    {
+        int userid=  (int) httpServletRequest.getSession().getAttribute("userid");
+        Map<String, Object> rs = new HashMap<>();
+
+        int result=fileAndFolderService.delemptyfolder(userid);
+        if(result!=-1)
+        {
+            rs.put("code", 0);
+            rs.put("msg", "共清理了"+result+"个空文件夹");
+        }else {
+            rs.put("code", 1);
+            rs.put("msg", "清理空文件夹失败");
+        }
+        return  rs;
+    }
 }

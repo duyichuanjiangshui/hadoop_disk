@@ -58,32 +58,20 @@ public interface FileindexMapper {
     })
     Fileindex selectByPrimaryKey(Integer fileid);
 
-    @Update({
-            "update fileindex",
-            "set fatherFolderid = #{fatherfolderid,jdbcType=VARCHAR},",
-            "groupId = #{groupid,jdbcType=INTEGER},",
-            "uploadLocationId = #{uploadlocationid,jdbcType=INTEGER},",
-            "size = #{size,jdbcType=REAL},",
-            "name = #{name,jdbcType=VARCHAR},",
-            "updateTime = #{updatetime,jdbcType=VARCHAR},",
-            "uploadTime = #{uploadtime,jdbcType=VARCHAR},",
-            "userId = #{userid,jdbcType=INTEGER},",
-            "deleteTime = #{deletetime,jdbcType=VARCHAR},",
-            "shareType = #{sharetype,jdbcType=INTEGER},",
-            "SaveNum = #{savenum,jdbcType=INTEGER},",
-            "fileType = #{filetype,jdbcType=VARCHAR},",
-            "sortype = #{sortype,jdbcType=INTEGER},",
-            "isDelete = #{isdelete,jdbcType=INTEGER}",
-            "where fileId = #{fileid,jdbcType=INTEGER}"
-    })
+    @Update("<script> update fileindex<set><if test=\"fatherfolderid != null\">fatherFolderid = #{fatherfolderid,jdbcType=VARCHAR},</if><if test=\"groupid != null\">groupId = #{groupid,jdbcType=INTEGER},</if><if test=\"uploadlocationid != null\">uploadLocationId = #{uploadlocationid,jdbcType=INTEGER},</if><if test=\"size != null\">size = #{size,jdbcType=REAL},</if><if test=\"name != null\">name = #{name,jdbcType=VARCHAR},</if><if test=\"updatetime != null\">updateTime = #{updatetime,jdbcType=VARCHAR},</if><if test=\"uploadtime != null\">uploadTime = #{uploadtime,jdbcType=VARCHAR},</if><if test=\"userid != null\">userId = #{userid,jdbcType=INTEGER},</if><if test=\"deletetime != null\">deleteTime = #{deletetime,jdbcType=VARCHAR},</if><if test=\"sharetype != null\">shareType = #{sharetype,jdbcType=INTEGER},</if><if test=\"savenum != null\">SaveNum = #{savenum,jdbcType=INTEGER},</if><if test=\"filetype != null\">fileType = #{filetype,jdbcType=VARCHAR},</if><if test=\"sortype != null\">sortype = #{sortype,jdbcType=INTEGER},</if><if test=\"isdelete != null\">isDelete = #{isdelete,jdbcType=INTEGER},</if></set>where fileId = #{fileid,jdbcType=INTEGER}</script>")
     int updateByPrimaryKey(Fileindex record);
-
-    
+    @Update(" update fileindex set isDelete = #{isdelete} , deletetime = #{deletetime} where fileId = #{fileid}")
+    int updateisdelete(int isdelete,int fileid,String deletetime);
     @Select({
             "select  * from fileindex "+
             "where fatherFolderid = #{fatherFolderid}  and isDelete=0"
     })
     List<Fileindex> selectByFatherFolder(String fatherFolderid);
+    @Select({
+            "select  * from fileindex "+
+                    "where fatherFolderid = #{fatherFolderid} "
+    })
+    List<Fileindex> selectAllByFatherFolder(String fatherFolderid);
     @Select({
             "select  * from fileindex "+
                     "where fatherFolderid = #{fatherFolderid} and shareType = 1 and isDelete=0"
@@ -107,5 +95,9 @@ public interface FileindexMapper {
     List<Fileindex> selectAllPublicByLikeName(@Param("name") String name);
     @Select("SELECT * from fileindex WHERE shareType = 1 and isDelete=0 and sortype=#{type} and groupId is null and  `name` like '%${name}%'")
     List<Fileindex> selectByTypePublicByLikeName(@Param("name") String name,int type);
+    @Select("SELECT * from fileindex where userId= #{userid} and isDelete=0 and uploadLocationId in (SELECT uploadLocationId as amount from fileindex where userId= #{userid} and isDelete=0 and uploadLocationId <> '' GROUP BY uploadLocationId HAVING COUNT(*)>=2)")
+    List<Fileindex> selectrepateuploationid(int userid);
+    @Select("SELECT * from fileindex where userId =#{userid} and isDelete=0 AND uploadLocationId is NULL;")
+    List<Fileindex> selectgarbage(int userid);
 
 }

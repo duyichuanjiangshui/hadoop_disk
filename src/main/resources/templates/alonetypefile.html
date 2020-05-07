@@ -279,6 +279,33 @@
                 });
             }
         });
+        table.on('tool(test)', function (obj) {
+
+            let data = obj.data;
+
+            //console.log(obj)
+
+            if (obj.event === 'down') {
+                var url = "http://127.0.0.1:8000/hadoop/uploadAndDown/down?fileindexid=" + data.id;//下载文件url
+                $("#fileForm").attr('action', url);
+
+                $("#fileForm").submit();
+
+            } else if (obj.event === 'share') {
+                json = '[' + JSON.stringify(data) + ']';
+                console.log(json);
+                layer.open({
+                    type: 2,
+                    title: '请选则共享',
+                    shadeClose: true,
+                    shade: 0.8,
+                    offset: '30px',
+                    area: ['80%', '60%'],
+                    content: "/hadoop/share/sharePage" //iframe的url
+                });
+
+            }
+        });
 
     });
 
@@ -298,10 +325,24 @@
 //layer.msg("大家好，这是最简单的弹层", { time: 9000, type: 1,title:['测试一下','font-size:18px'] });
         $("#share").click(function () {
             var checkStatus = table.checkStatus('fileAndFolder');
-            console.log("dsf");
-            console.log(checkStatus.data);//获取选中行的数据
-            console.log(checkStatus.data.length);//获取选中行数量，可作为是否有选中行的条件
-            console.log(checkStatus.isAll); //表格是否全选
+            var data = checkStatus.data;
+            if (data.length > 0) {
+                json = JSON.stringify(data);
+                layer.open({
+                    type: 2,
+                    title: '请选择共享',
+                    shadeClose: true,
+                    shade: 0.8,
+                    offset: '30px',
+                    area: ['80%', '60%'],
+                    content: "/hadoop/share/sharePage" //iframe的url
+                });
+            } else {
+                layer.msg("请先选中！！", {
+                    icon: 2,
+                    time: 1500
+                });
+            }
         });
         $("#deleteall").click(function () {
             var checkStatus = table.checkStatus('fileAndFolder');
@@ -379,7 +420,7 @@
             var text = $("#seaarchtxt").val();
             var sorttype= [[${type}]];
             console.log(text);
-            table.reload('maintenanceTableId',{
+            table.reload('fileAndFolder',{
                 url: '/hadoop/fileAndFolder/searchalonetypefile?type=' + sorttype+'&name='+text,
                 where:{
                     search:text
